@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 39 55% 94%;
+  --foreground: 211 28% 18%;
+  --border: 36 31% 82%;
+  --input: 36 31% 78%;
+  --ring: 13 72% 52%;
+  --card: 42 67% 98%;
+  --card-foreground: 211 28% 18%;
+  --primary: 13 72% 52%;
+  --primary-foreground: 42 67% 98%;
+  --secondary: 173 36% 28%;
+  --secondary-foreground: 42 67% 98%;
+  --muted: 37 36% 88%;
+  --muted-foreground: 210 15% 43%;
+  --accent: 42 92% 59%;
+  --accent-foreground: 211 28% 18%;
+  --destructive: 2 65% 43%;
+  --destructive-foreground: 42 67% 98%;
+  --sidebar: 37 44% 91%;
+  --sidebar-foreground: 211 28% 18%;
+  --sidebar-border: 36 31% 82%;
+  --sidebar-primary: 13 72% 52%;
+  --sidebar-primary-foreground: 42 67% 98%;
+  --sidebar-accent: 173 36% 28%;
+  --sidebar-accent-foreground: 42 67% 98%;
+  --sidebar-ring: 13 72% 52%;
+  --popover: 42 67% 98%;
+  --popover-foreground: 211 28% 18%;
+  --radius: 0.875rem;
+  --app-font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --app-font-serif: 'Fraunces', Georgia, serif;
+  --app-font-mono: 'DM Sans', ui-monospace, monospace;
+  --elevate-1: rgba(33, 46, 55, 0.04);
+  --elevate-2: rgba(33, 46, 55, 0.08);
+}
+
+.dark {
+  --background: 211 28% 14%;
+  --foreground: 39 55% 94%;
+  --border: 211 20% 27%;
+  --input: 211 20% 31%;
+  --ring: 42 92% 59%;
+  --card: 211 24% 18%;
+  --card-foreground: 39 55% 94%;
+  --primary: 13 72% 58%;
+  --primary-foreground: 211 28% 14%;
+  --secondary: 173 36% 38%;
+  --secondary-foreground: 39 55% 94%;
+  --muted: 211 20% 24%;
+  --muted-foreground: 39 20% 70%;
+  --accent: 42 92% 59%;
+  --accent-foreground: 211 28% 14%;
+  --destructive: 2 65% 52%;
+  --destructive-foreground: 39 55% 94%;
+  --sidebar: 211 24% 18%;
+  --sidebar-foreground: 39 55% 94%;
+  --sidebar-border: 211 20% 27%;
+  --sidebar-primary: 13 72% 58%;
+  --sidebar-primary-foreground: 211 28% 14%;
+  --sidebar-accent: 173 36% 38%;
+  --sidebar-accent-foreground: 39 55% 94%;
+  --sidebar-ring: 42 92% 59%;
+  --popover: 211 24% 18%;
+  --popover-foreground: 39 55% 94%;
+  --elevate-1: rgba(255, 248, 224, 0.05);
+  --elevate-2: rgba(255, 248, 224, 0.1);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    min-width: 320px;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--app-font-serif);
+  }
+
+  .texture {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .texture::after {
+    content: '';
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  }
+
+  .paper-card {
+    box-shadow: 0 18px 45px rgba(77, 58, 36, 0.09), 0 2px 5px rgba(77, 58, 36, 0.06);
+  }
+
+  .recipe-card {
+    box-shadow: 0 15px 35px rgba(77, 58, 36, 0.08);
+    transition: transform 220ms ease, box-shadow 220ms ease;
+  }
+
+  .recipe-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 42px rgba(77, 58, 36, 0.14);
+  }
+
+  .rise-in {
+    animation: rise-in 500ms cubic-bezier(.22, .8, .26, 1) both;
+  }
+
+  .rise-in-delay {
+    animation: rise-in 500ms 110ms cubic-bezier(.22, .8, .26, 1) both;
+  }
+
+  .fade-in {
+    animation: fade-in 350ms ease both;
+  }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}

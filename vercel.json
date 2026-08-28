@@ -1,13 +1,6 @@
 {
   "version": 2,
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.mjs"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/artifacts/jugaad-bites/dist/$1"
-    }
-  ]
+  "buildCommand": "pnpm --filter @workspace/jugaad-bites run build",
+  "outputDirectory": "artifacts/jugaad-bites/dist/public",
+  "framework": null
 }

@@ -1,6 +1,6 @@
 {
   "version": 2,
   "buildCommand": "pnpm --filter @workspace/jugaad-bites run build",
-  "outputDirectory": "artifacts/jugaad-bites/dist/public",
+  "outputDirectory": "artifacts/jugaad-bites/dist",
   "framework": null
 }

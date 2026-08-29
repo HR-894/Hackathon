@@ -30,7 +30,10 @@ Most recipe apps are built for seasoned chefs—they demand fancy spices, expens
   - **Warm Culinary Light Mode:** Soothing oatmilk cream (`#f6f1e7`) with terracotta accents.
   - **Midnight Dark Mode:** Deep slate (`#0f1518`) with neon mint accents.
 - **📱 PWA & 100% Offline Survival Mode:** 1-click install on Android, iOS, and Desktop with offline fallback caching so you can cook even when hostel Wi-Fi dies.
-- **🤖 Zero-Fail Gemini AI Engine:** Automated Google AI Studio integration with dynamic model auto-discovery (`gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-pro`) and zero-fail local fallback generation.
+- **🤖 Ultra-Fast Multi-AI Engine:**
+  - **Tier 1 (Default Primary):** Groq LPU (`llama-3.3-70b-versatile` / `llama-3.1-8b-instant`) with sub-second generation speeds.
+  - **Tier 2 (Fallback):** Google Gemini 1.5 Flash via Google AI Studio.
+  - **Tier 3 (Offline):** Smart local survival recipe generator.
 
 ---
 
@@ -42,7 +45,7 @@ Most recipe apps are built for seasoned chefs—they demand fancy spices, expens
 - **Audio Engine:** Native Web Audio API Synthesizer (Zero external mp3 files, 100% offline)
 - **Effects:** HTML5 Canvas Confetti & Ambient Rising Steam
 - **PWA:** Web App Manifest + Offline Service Worker
-- **AI Engine:** Google Gemini 1.5 Flash via Google AI Studio
+- **AI Engines:** Groq LPU (Llama 3.3 70B) + Google Gemini 1.5 Flash
 
 ---
 
@@ -61,11 +64,14 @@ Create a `.env` file inside `artifacts/jugaad-bites/`:
 cp artifacts/jugaad-bites/.env.example artifacts/jugaad-bites/.env 2>/dev/null || touch artifacts/jugaad-bites/.env
 ```
 
-Add your free Google Gemini API key:
+Add your free API key (Groq, Gemini, or both):
 ```env
-VITE_GEMINI_API_KEY=your_google_gemini_api_key_here
+# Groq (Default ultra-fast primary, https://console.groq.com/keys)
+VITE_GROQ_API_KEY=your_groq_api_key_here
+
+# Google Gemini (Fallback engine, https://aistudio.google.com/app/apikey)
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
 ```
-> *(Get a free key in 30 seconds at [Google AI Studio](https://aistudio.google.com/app/apikey) — no credit card required).*
 
 ### 3. Start the Dev Server
 From the project root:
@@ -97,8 +103,8 @@ The project is pre-configured for free static Vercel deployment:
 
 3. **Add Environment Variable on Vercel:**
    - In Vercel Project Settings ➔ **Environment Variables**, add:
-     - **Key:** `VITE_GEMINI_API_KEY`
-     - **Value:** `your_gemini_api_key`
+     - **Key:** `VITE_GROQ_API_KEY` (and/or `VITE_GEMINI_API_KEY`)
+     - **Value:** `your_api_key`
    - Click **Deploy**! 🚀
 
 ---

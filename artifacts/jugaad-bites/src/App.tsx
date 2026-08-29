@@ -71,7 +71,65 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 // ==========================================
-// Robust Google AI Studio Client
+// Ultra-Fast Groq AI Client (Default Primary Engine)
+// ==========================================
+export class GroqClient {
+  private apiKey: string;
+
+  constructor(apiKey: string) {
+    this.apiKey = apiKey.trim();
+  }
+
+  async generateRecipes(prompt: string, systemInstruction: string): Promise<string> {
+    const models = [
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
+      'llama3-70b-8192',
+      'mixtral-8x7b-32768',
+    ];
+
+    let lastError: Error = new Error('Could not connect to Groq API');
+
+    for (const model of models) {
+      try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: 'system', content: systemInstruction },
+              { role: 'user', content: prompt },
+            ],
+            temperature: 0.35,
+            max_tokens: 2048,
+          }),
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || '';
+        if (content) return content;
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          lastError = err;
+        }
+      }
+    }
+
+    throw lastError;
+  }
+}
+
+// ==========================================
+// Robust Google AI Studio Client (Secondary Fallback Engine)
 // ==========================================
 export class GoogleGenerativeAI {
   private apiKey: string;
@@ -499,7 +557,10 @@ export default function App() {
     setStatusNote(null);
     setLoadingMsgIndex(0);
 
-    const apiKey =
+    const groqKey =
+      (import.meta as unknown as { env: Record<string, string> }).env?.VITE_GROQ_API_KEY ||
+      '';
+    const geminiKey =
       (import.meta as unknown as { env: Record<string, string> }).env?.VITE_GEMINI_API_KEY ||
       '';
 
@@ -510,10 +571,73 @@ Hunger Urgency Mode: ${hungerMode}
 
 Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.`;
 
+    const parseAndEnrichJson = (rawText: string): Recipe[] | null => {
+      let cleanJson = rawText.trim();
+      if (cleanJson.startsWith('```json')) {
+        cleanJson = cleanJson.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+      } else if (cleanJson.startsWith('```')) {
+        cleanJson = cleanJson.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+
+      let parsed: Recipe[] | null = null;
+      try {
+        const data = JSON.parse(cleanJson);
+        if (Array.isArray(data)) parsed = data;
+        else if (data && Array.isArray(data.recipes)) parsed = data.recipes;
+      } catch {
+        const match = cleanJson.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (match) {
+          try {
+            parsed = JSON.parse(match[0]);
+          } catch {
+            parsed = null;
+          }
+        }
+      }
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((rec, i) => ({
+          ...rec,
+          jugaadHack:
+            rec.jugaadHack ||
+            (i === 0
+              ? 'No chopping board? Tear soft veggies with clean hands or cut against a tiffin lid.'
+              : 'No strainer? Hold the lid slightly tilted over the pan to drain excess water.'),
+          substitutions: rec.substitutions || [
+            'No butter? 1 teaspoon cooking oil or ghee works equally well.',
+            'Missing chillies? A pinch of black pepper or ketchup gives great flavor.',
+          ],
+        }));
+      }
+      return null;
+    };
+
     try {
-      if (apiKey && !isOffline) {
+      // 1. Try Groq AI (Default Ultra-Fast Primary Engine)
+      if (groqKey && !isOffline) {
         try {
-          const genAI = new GoogleGenerativeAI(apiKey);
+          const groq = new GroqClient(groqKey);
+          const rawText = await groq.generateRecipes(userPrompt, SYSTEM_PROMPT);
+          const enriched = parseAndEnrichJson(rawText);
+
+          if (enriched) {
+            setRecipes(enriched);
+            sounds.playSuccess();
+            setIsLoading(false);
+            setTimeout(() => {
+              resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 120);
+            return;
+          }
+        } catch (groqErr) {
+          console.warn('Groq AI fallback triggered:', groqErr);
+        }
+      }
+
+      // 2. Try Google Gemini AI (Secondary Fallback Engine)
+      if (geminiKey && !isOffline) {
+        try {
+          const genAI = new GoogleGenerativeAI(geminiKey);
           const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',
             systemInstruction: SYSTEM_PROMPT,
@@ -521,31 +645,10 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
 
           const result = await model.generateContent(userPrompt);
           const rawText = result.response.text();
+          const enriched = parseAndEnrichJson(rawText);
 
-          let cleanJson = rawText.trim();
-          if (cleanJson.startsWith('```json')) {
-            cleanJson = cleanJson.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
-          } else if (cleanJson.startsWith('```')) {
-            cleanJson = cleanJson.replace(/^```\s*/, '').replace(/\s*```$/, '');
-          }
-
-          const parsedData: Recipe[] = JSON.parse(cleanJson);
-
-          if (Array.isArray(parsedData) && parsedData.length > 0) {
-            const enrichedData = parsedData.map((rec, i) => ({
-              ...rec,
-              jugaadHack:
-                rec.jugaadHack ||
-                (i === 0
-                  ? 'No chopping board? Tear soft veggies with clean hands or cut against a tiffin lid.'
-                  : 'No strainer? Hold the lid slightly tilted over the pan to drain excess water.'),
-              substitutions: rec.substitutions || [
-                'No butter? 1 teaspoon cooking oil or ghee works equally well.',
-                'Missing chillies? A pinch of black pepper or ketchup gives great flavor.',
-              ],
-            }));
-
-            setRecipes(enrichedData);
+          if (enriched) {
+            setRecipes(enriched);
             sounds.playSuccess();
             setIsLoading(false);
             setTimeout(() => {
@@ -555,11 +658,12 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
           }
         } catch (apiErr) {
           console.warn('Gemini API fallback triggered:', apiErr);
-          setStatusNote('Serving curated survival recipes (Gemini fallback mode).');
+          setStatusNote('Serving curated survival recipes (auto-fallback mode).');
         }
       }
 
-      await new Promise((res) => setTimeout(res, 800));
+      // 3. Zero-Fail Local Dynamic Survival Engine (Offline ready)
+      await new Promise((res) => setTimeout(res, 600));
       const dynamicFallback = generateDynamicFallback(ingredients, selectedEquipment);
       setRecipes(dynamicFallback);
       sounds.playSuccess();

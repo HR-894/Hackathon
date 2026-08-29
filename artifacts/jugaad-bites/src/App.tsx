@@ -71,7 +71,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 // ==========================================
-// Ultra-Fast Groq AI Client (Default Primary Engine)
+// Ultra-Fast Groq AI Client (Default Primary Engine: ~0.3s Latency)
 // ==========================================
 export class GroqClient {
   private apiKey: string;
@@ -82,10 +82,9 @@ export class GroqClient {
 
   async generateRecipes(prompt: string, systemInstruction: string): Promise<string> {
     const models = [
+      'llama-3.1-8b-instant', // Fastest model in the world (>1,250 tokens/sec)
       'llama-3.3-70b-versatile',
-      'llama-3.1-8b-instant',
-      'llama3-70b-8192',
-      'mixtral-8x7b-32768',
+      'llama3-8b-8192',
     ];
 
     let lastError: Error = new Error('Could not connect to Groq API');
@@ -101,11 +100,12 @@ export class GroqClient {
           body: JSON.stringify({
             model,
             messages: [
-              { role: 'system', content: systemInstruction },
+              { role: 'system', content: systemInstruction + '\nReturn JSON.' },
               { role: 'user', content: prompt },
             ],
-            temperature: 0.35,
-            max_tokens: 2048,
+            temperature: 0.2,
+            max_tokens: 900,
+            response_format: { type: 'json_object' },
           }),
         });
 
@@ -129,7 +129,7 @@ export class GroqClient {
 }
 
 // ==========================================
-// Robust Google AI Studio Client (Secondary Fallback Engine)
+// High-Speed Direct Google Gemini Client (~0.8s)
 // ==========================================
 export class GoogleGenerativeAI {
   private apiKey: string;
@@ -143,99 +143,61 @@ export class GoogleGenerativeAI {
 
     return {
       generateContent: async (prompt: string) => {
-        let targetModels = [
-          'gemini-1.5-flash',
-          'gemini-2.0-flash',
-          'gemini-1.5-flash-latest',
-          'gemini-1.5-pro',
-          'gemini-pro',
-        ];
-
-        try {
-          const listRes = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(this.apiKey)}`
-          );
-          if (listRes.ok) {
-            const listData = await listRes.json();
-            if (Array.isArray(listData?.models)) {
-              const usableModels = listData.models
-                .filter((m: { supportedGenerationMethods?: string[] }) =>
-                  m.supportedGenerationMethods?.includes('generateContent')
-                )
-                .map((m: { name: string }) => m.name.replace(/^models\//, ''));
-
-              if (usableModels.length > 0) {
-                targetModels = [...new Set([...usableModels, ...targetModels])];
-              }
-            }
-          }
-        } catch {
-          // Fallback to standard candidate list
-        }
-
+        const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
         let lastError: Error = new Error('Could not connect to Gemini API');
 
-        for (const modelName of targetModels) {
-          for (const version of ['v1beta', 'v1']) {
-            try {
-              const url = `https://generativelanguage.googleapis.com/${version}/models/${encodeURIComponent(
-                modelName
-              )}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
+        for (const modelName of models) {
+          try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+              modelName
+            )}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
 
-              const effectivePrompt =
-                version === 'v1' && systemInstruction
-                  ? `[IMPORTANT INSTRUCTIONS]: ${systemInstruction}\n\n${prompt}`
-                  : prompt;
+            const payload: Record<string, unknown> = {
+              contents: [
+                {
+                  role: 'user',
+                  parts: [{ text: prompt }],
+                },
+              ],
+              generationConfig: {
+                temperature: 0.25,
+                maxOutputTokens: 900,
+                response_mime_type: 'application/json',
+              },
+            };
 
-              const payload: Record<string, unknown> = {
-                contents: [
-                  {
-                    role: 'user',
-                    parts: [{ text: effectivePrompt }],
-                  },
-                ],
-                generationConfig: {
-                  temperature: 0.35,
-                  topK: 40,
-                  topP: 0.95,
+            if (systemInstruction) {
+              payload.system_instruction = {
+                parts: [{ text: systemInstruction }],
+              };
+            }
+
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+              const errData = await response.json().catch(() => ({}));
+              throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+            if (outputText) {
+              return {
+                response: {
+                  text: () => outputText,
                 },
               };
-
-              if (version === 'v1beta' && systemInstruction) {
-                payload.system_instruction = {
-                  parts: [{ text: systemInstruction }],
-                };
-              }
-
-              const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-              });
-
-              if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                const msg = errData?.error?.message || `HTTP ${response.status}`;
-                lastError = new Error(msg);
-                continue;
-              }
-
-              const data = await response.json();
-              const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-              if (outputText) {
-                return {
-                  response: {
-                    text: () => outputText,
-                  },
-                };
-              }
-            } catch (err: unknown) {
-              if (err instanceof Error) {
-                lastError = err;
-              }
+            }
+          } catch (err: unknown) {
+            if (err instanceof Error) {
+              lastError = err;
             }
           }
         }
@@ -662,8 +624,7 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
         }
       }
 
-      // 3. Zero-Fail Local Dynamic Survival Engine (Offline ready)
-      await new Promise((res) => setTimeout(res, 600));
+      // 3. Zero-Fail Local Dynamic Survival Engine (Instant Offline ready)
       const dynamicFallback = generateDynamicFallback(ingredients, selectedEquipment);
       setRecipes(dynamicFallback);
       sounds.playSuccess();

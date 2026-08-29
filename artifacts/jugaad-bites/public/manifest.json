@@ -1,0 +1,36 @@
+{
+  "name": "JugaadBites: The Idiot-Proof Recipe Finder",
+  "short_name": "JugaadBites",
+  "description": "Zero culinary jargon. Zero panic. Survival recipes for absolute beginners.",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fbf5e9",
+  "theme_color": "#e65e3d",
+  "categories": ["food", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Find Recipes",
+      "short_name": "Recipes",
+      "description": "Quickly find beginner survival recipes",
+      "url": "/",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    }
+  ]
+}

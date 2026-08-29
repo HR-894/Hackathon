@@ -482,7 +482,7 @@ export default function App() {
     e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
   };
 
-  // Fetch Logic (Reads environment variables seamlessly)
+  // Fetch Logic
   const fetchRecipes = async () => {
     if (ingredients.length === 0) {
       inputRef.current?.focus();
@@ -535,7 +535,7 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
               jugaadHack:
                 rec.jugaadHack ||
                 (i === 0
-                  ? 'No chopping board? Tear soft veggies with clean hands or cut against a flat tiffin lid.'
+                  ? 'No chopping board? Tear soft veggies with clean hands or cut against a tiffin lid.'
                   : 'No strainer? Hold the lid slightly tilted over the pan to drain excess water.'),
               substitutions: rec.substitutions || [
                 'No butter? 1 teaspoon cooking oil or ghee works equally well.',
@@ -628,7 +628,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
   const confidenceScore = Math.min(100, ingredients.length * 35);
 
   return (
-    <div className="min-h-screen bg-[#f6f1e7] dark:bg-[#0f1518] text-[#1e3038] dark:text-[#f3eee4] font-sans antialiased selection:bg-[#e65e3d]/20 selection:text-[#e65e3d] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-[#f8f5ee] dark:bg-[#0f1518] text-[#16202a] dark:text-[#f3eee4] font-sans antialiased selection:bg-[#e65e3d]/20 selection:text-[#e65e3d] relative overflow-x-hidden transition-colors duration-300">
       {/* Interactive Kitchen Spatula Cursor */}
       <KitchenCursor />
 
@@ -638,7 +638,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       {/* Top Fixed Reading Progress Line */}
       <div className="fixed top-0 left-0 right-0 h-1 z-50 bg-transparent">
         <div
-          className="h-full bg-gradient-to-r from-[#e65e3d] via-[#f4c453] to-[#1d6a64] transition-all duration-100 ease-out"
+          className="h-full bg-gradient-to-r from-[#e65e3d] via-[#f4c453] to-[#166e64] transition-all duration-100 ease-out"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
@@ -647,7 +647,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[#e65e3d]/10 dark:bg-[#e65e3d]/15 blur-3xl" />
         <div className="absolute top-1/3 -left-32 h-80 w-80 rounded-full bg-[#f4c453]/20 dark:bg-[#f4c453]/10 blur-3xl" />
-        <div className="absolute -bottom-32 right-1/4 h-96 w-96 rounded-full bg-[#1d6a64]/10 dark:bg-[#1d6a64]/20 blur-3xl" />
+        <div className="absolute -bottom-32 right-1/4 h-96 w-96 rounded-full bg-[#166e64]/10 dark:bg-[#166e64]/20 blur-3xl" />
       </div>
 
       {/* Offline Alert Ribbon */}
@@ -661,7 +661,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       {/* ========================================== */}
       {/* FIXED GLASS HEADER */}
       {/* ========================================== */}
-      <header className="fixed top-0 left-0 right-0 z-40 border-b border-[#ded4c1] dark:border-[#27373f] bg-[#f8f3ea]/90 dark:bg-[#151e22]/90 backdrop-blur-xl transition-colors duration-300">
+      <header className="fixed top-0 left-0 right-0 z-40 border-b border-[#ded4c1] dark:border-[#27373f] bg-[#f8f5ee]/90 dark:bg-[#151e22]/90 backdrop-blur-xl transition-colors duration-300">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           {/* Logo */}
           <div
@@ -672,10 +672,10 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               <Utensils size={20} strokeWidth={2.5} />
             </div>
             <div>
-              <span className="font-serif text-xl font-bold tracking-tight text-[#1e3038] dark:text-[#f3eee4]">
+              <span className="font-serif text-xl font-bold tracking-tight text-[#16202a] dark:text-[#f3eee4]">
                 Jugaad<span className="text-[#e65e3d]">Bites</span>
               </span>
-              <p className="text-[0.7rem] font-semibold text-[#7b8179] dark:text-[#8f9f99]">
+              <p className="text-[0.7rem] font-semibold text-[#52636a] dark:text-[#8f9f99]">
                 The Idiot-Proof Recipe Finder
               </p>
             </div>
@@ -686,20 +686,20 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
-              className="flex items-center gap-1 rounded-lg border border-[#ded4c1] dark:border-[#2a3c45] bg-[#fffdf9] dark:bg-[#192429] p-2 text-[#52635e] dark:text-[#a2b5ae] transition hover:border-[#e65e3d] hover:text-[#e65e3d] dark:hover:text-[#f06c4b]"
-              title={theme === 'dark' ? 'Switch to Warm Kitchen Light Mode' : 'Switch to Midnight Dark Mode'}
+              className="flex items-center gap-1 rounded-lg border border-[#ded4c1] dark:border-[#2a3c45] bg-[#fffdf9] dark:bg-[#192429] p-2 text-[#374950] dark:text-[#a2b5ae] transition hover:border-[#e65e3d] hover:text-[#e65e3d] dark:hover:text-[#f06c4b]"
+              title={theme === 'dark' ? 'Switch to Warm Light Mode' : 'Switch to Midnight Dark Mode'}
             >
               {theme === 'dark' ? (
                 <Sun size={15} className="text-[#f4c453]" />
               ) : (
-                <Moon size={15} className="text-[#52635e]" />
+                <Moon size={15} className="text-[#374950]" />
               )}
             </button>
 
             {/* Audio Effects Toggle */}
             <button
               onClick={handleMuteToggle}
-              className="flex items-center gap-1 rounded-lg border border-[#ded4c1] dark:border-[#2a3c45] bg-[#fffdf9] dark:bg-[#192429] px-2.5 py-1.5 text-xs font-semibold text-[#52635e] dark:text-[#a2b5ae] transition hover:border-[#1d6a64] hover:text-[#1d6a64] dark:hover:text-[#38c9bc]"
+              className="flex items-center gap-1 rounded-lg border border-[#ded4c1] dark:border-[#2a3c45] bg-[#fffdf9] dark:bg-[#192429] px-2.5 py-1.5 text-xs font-semibold text-[#374950] dark:text-[#a2b5ae] transition hover:border-[#166e64] hover:text-[#166e64] dark:hover:text-[#38c9bc]"
               title={isMuted ? 'Turn Sound Effects ON (Pops, Timer Bells)' : 'Turn Sound Effects OFF'}
             >
               {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
@@ -730,28 +730,28 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       </header>
 
       {/* Main Content Area */}
-      <main className="relative mx-auto max-w-6xl px-4 pt-24 sm:pt-28 pb-16 sm:px-6">
+      <main className="relative z-10 mx-auto max-w-6xl px-4 pt-24 sm:pt-28 pb-16 sm:px-6">
         {/* Hero Section */}
         <div className="mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#ded4c1] dark:border-[#2d3f47] bg-[#fffdf9] dark:bg-[#162126] px-3.5 py-1 text-xs font-bold text-[#1d6a64] dark:text-[#38c9bc] shadow-xs">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#bfe2d4] dark:border-[#2d3f47] bg-[#e6f4ee] dark:bg-[#162126] px-3.5 py-1 text-xs font-bold text-[#115e54] dark:text-[#38c9bc] shadow-xs">
             <Sparkles size={14} className="text-[#e65e3d]" />
             <span>Zero Chef Jargon • Interactive Step Checklist • Absolute Survival</span>
           </div>
 
-          <h1 className="mt-4 font-serif text-3xl font-extrabold tracking-tight text-[#1e3038] dark:text-[#f3eee4] sm:text-5xl sm:leading-[1.15]">
+          <h1 className="mt-4 font-serif text-3xl font-extrabold tracking-tight text-[#142228] dark:text-[#f3eee4] sm:text-5xl sm:leading-[1.15]">
             Terrified of the kitchen? <br />
             <span className="text-[#e65e3d]">We got you covered.</span>
           </h1>
 
-          <p className="mt-3 text-sm text-[#5f6c68] dark:text-[#97a8a1] sm:text-base leading-relaxed max-w-xl mx-auto">
+          <p className="mt-3 text-sm text-[#455860] dark:text-[#c5d8d0] sm:text-base leading-relaxed max-w-xl mx-auto font-medium">
             Throw in whatever random ingredients survived in your room. We&apos;ll give you 2 foolproof, zero-panic recipes with step-by-step hand-holding.
           </p>
 
           {/* Kitchen Confidence Meter */}
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#fffdf9]/90 dark:bg-[#162126]/90 border border-[#ded4c1] dark:border-[#2a3c45] px-4 py-1 text-xs font-semibold text-[#5a6764] dark:text-[#9cb0a8] shadow-xs backdrop-blur-xs">
-            <Activity size={14} className={confidenceScore >= 70 ? 'text-[#1d6a64] dark:text-[#38c9bc]' : 'text-[#e65e3d]'} />
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#fffdf9] dark:bg-[#162126] border border-[#ded4c1] dark:border-[#2a3c45] px-4 py-1 text-xs font-semibold text-[#3e5058] dark:text-[#9cb0a8] shadow-xs backdrop-blur-xs">
+            <Activity size={14} className={confidenceScore >= 70 ? 'text-[#166e64] dark:text-[#38c9bc]' : 'text-[#e65e3d]'} />
             <span>Kitchen Confidence:</span>
-            <span className={`font-bold ${confidenceScore >= 70 ? 'text-[#1d6a64] dark:text-[#38c9bc]' : 'text-[#e65e3d]'}`}>
+            <span className={`font-bold ${confidenceScore >= 70 ? 'text-[#166e64] dark:text-[#38c9bc]' : 'text-[#e65e3d]'}`}>
               {confidenceScore === 0
                 ? '0% (Need Groceries)'
                 : confidenceScore < 70
@@ -768,7 +768,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             {/* Step 1: Ingredients Tag Input */}
             <div>
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm font-bold text-[#263e43] dark:text-[#e4efe9]">
+                <label className="flex items-center gap-2 text-sm font-bold text-[#16202a] dark:text-[#e4efe9]">
                   <ChefHat size={18} className="text-[#e65e3d]" />
                   <span>1. What ingredients do you have?</span>
                 </label>
@@ -778,7 +778,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                       sounds.playDelete();
                       setIngredients([]);
                     }}
-                    className="text-xs font-semibold text-[#8c877b] dark:text-[#8e9f99] hover:text-[#e65e3d] transition"
+                    className="text-xs font-semibold text-[#61747d] dark:text-[#8e9f99] hover:text-[#e65e3d] transition"
                   >
                     Clear all ({ingredients.length})
                   </button>
@@ -795,14 +795,14 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     onChange={(e) => setInputVal(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type an ingredient (e.g. Bread, Egg, Maggi) and press Enter"
-                    className="h-11 w-full rounded-xl border border-[#d8c9b1] dark:border-[#2c3d45] bg-[#f7f2e8] dark:bg-[#11181c] px-4 text-sm text-[#263e43] dark:text-[#e4efe9] outline-none transition placeholder:text-[#a49b8b] dark:placeholder:text-[#6a7d76] focus:border-[#1d6a64] dark:focus:border-[#38c9bc] focus:ring-3 focus:ring-[#1d6a64]/15"
+                    className="h-11 w-full rounded-xl border border-[#d0c2ac] dark:border-[#2c3d45] bg-[#f8f3ea] dark:bg-[#11181c] px-4 text-sm text-[#16202a] dark:text-[#e4efe9] outline-none transition placeholder:text-[#84969e] dark:placeholder:text-[#6a7d76] focus:border-[#166e64] dark:focus:border-[#38c9bc] focus:ring-3 focus:ring-[#166e64]/15 font-medium"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => addIngredient(inputVal)}
                   disabled={!inputVal.trim()}
-                  className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-[#1d6a64] dark:bg-[#207c72] px-4 text-xs font-bold text-[#fffaf1] transition hover:bg-[#15524d] disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-xs active:scale-95"
+                  className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-[#166e64] dark:bg-[#207c72] px-4 text-xs font-bold text-[#ffffff] transition hover:bg-[#115e54] disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-xs active:scale-95"
                 >
                   <Plus size={16} />
                   <span>Add</span>
@@ -812,7 +812,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               {/* Tag / Chip List */}
               <div className="mt-3 min-h-[38px]">
                 {ingredients.length === 0 ? (
-                  <p className="text-xs text-[#8c877b] dark:text-[#84958f] italic">
+                  <p className="text-xs text-[#61747d] dark:text-[#84958f] italic">
                     No ingredients added yet. Type above or click a quick suggestion below!
                   </p>
                 ) : (
@@ -820,13 +820,13 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     {ingredients.map((ing, index) => (
                       <span
                         key={`${ing}-${index}`}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#bfe2d4] dark:border-[#2a4d44] bg-[#e3f4ed] dark:bg-[#16332c] px-3 py-1 text-xs font-bold text-[#1d6a64] dark:text-[#38c9bc] transition hover:bg-[#d5ece1] dark:hover:bg-[#1b3d35] animate-in fade-in zoom-in-95 duration-150 shadow-xs"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#b2ded0] dark:border-[#2a4d44] bg-[#def2ea] dark:bg-[#16332c] px-3 py-1 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc] transition hover:bg-[#cdece0] dark:hover:bg-[#1b3d35] animate-in fade-in zoom-in-95 duration-150 shadow-xs"
                       >
                         <span>{ing}</span>
                         <button
                           type="button"
                           onClick={() => removeIngredient(index)}
-                          className="rounded-full p-0.5 text-[#1d6a64]/70 dark:text-[#38c9bc]/70 hover:bg-[#1d6a64]/20 hover:text-[#1d6a64]"
+                          className="rounded-full p-0.5 text-[#0f5c53]/70 dark:text-[#38c9bc]/70 hover:bg-[#166e64]/20 hover:text-[#0f5c53]"
                           aria-label={`Remove ${ing}`}
                         >
                           <X size={12} strokeWidth={3} />
@@ -839,7 +839,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 
               {/* Quick Starter Suggestions */}
               <div className="mt-4 pt-3 border-t border-[#ede3cf] dark:border-[#27373f]">
-                <span className="text-[0.7rem] font-bold uppercase tracking-wider text-[#8c877b] dark:text-[#82938d] block mb-2">
+                <span className="text-[0.7rem] font-bold uppercase tracking-wider text-[#61747d] dark:text-[#82938d] block mb-2">
                   Quick Add Stash Favorites:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -855,8 +855,8 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         disabled={isAdded}
                         className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
                           isAdded
-                            ? 'bg-[#ded4c1]/60 dark:bg-[#202d33] text-[#9c9588] dark:text-[#6a7d77] cursor-default'
-                            : 'border border-[#ded4c1] dark:border-[#2c3f47] bg-[#f7f2e8] dark:bg-[#182329] text-[#5e564a] dark:text-[#a8bbb3] hover:border-[#e65e3d] hover:bg-[#ffece6] dark:hover:bg-[#2c1d18] hover:text-[#e65e3d] active:scale-95'
+                            ? 'bg-[#ded4c1]/60 dark:bg-[#202d33] text-[#788a91] dark:text-[#6a7d77] cursor-default'
+                            : 'border border-[#ded4c1] dark:border-[#2c3f47] bg-[#f8f3ea] dark:bg-[#182329] text-[#2c3d44] dark:text-[#a8bbb3] hover:border-[#e65e3d] hover:bg-[#ffece6] dark:hover:bg-[#2c1d18] hover:text-[#e65e3d] active:scale-95'
                         }`}
                       >
                         + {item}
@@ -870,11 +870,11 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             {/* Step 2: Multi-Select Equipment Checkboxes */}
             <div className="mt-8 pt-6 border-t border-[#ede3cf] dark:border-[#27373f]">
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm font-bold text-[#263e43] dark:text-[#e4efe9]">
+                <label className="flex items-center gap-2 text-sm font-bold text-[#16202a] dark:text-[#e4efe9]">
                   <SlidersHorizontal size={18} className="text-[#e65e3d]" />
                   <span>2. What equipment do you have access to?</span>
                 </label>
-                <span className="text-xs font-semibold text-[#8c877b] dark:text-[#84958f]">
+                <span className="text-xs font-semibold text-[#61747d] dark:text-[#84958f]">
                   {selectedEquipment.length} selected
                 </span>
               </div>
@@ -888,30 +888,30 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                       onClick={() => toggleEquipment(id)}
                       className={`relative flex cursor-pointer flex-col justify-between rounded-xl border p-3 transition-all duration-200 select-none ${
                         isChecked
-                          ? 'border-[#1d6a64] dark:border-[#38c9bc] bg-[#e3f4ed] dark:bg-[#14322c] shadow-[2px_2px_0_#1d6a64]'
-                          : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f7f2e8] dark:bg-[#131c20] hover:border-[#c5b59a] dark:hover:border-[#3a525d] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
+                          ? 'border-[#166e64] dark:border-[#38c9bc] bg-[#def2ea] dark:bg-[#14322c] shadow-[2px_2px_0_#166e64]'
+                          : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f8f3ea] dark:bg-[#131c20] hover:border-[#b8a994] dark:hover:border-[#3a525d] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <Icon
                           size={18}
-                          className={isChecked ? 'text-[#1d6a64] dark:text-[#38c9bc]' : 'text-[#8b7560] dark:text-[#7f918a]'}
+                          className={isChecked ? 'text-[#0f5c53] dark:text-[#38c9bc]' : 'text-[#61747d] dark:text-[#7f918a]'}
                         />
                         <div
                           className={`flex h-4 w-4 items-center justify-center rounded-md border text-[10px] font-bold ${
                             isChecked
-                              ? 'border-[#1d6a64] dark:border-[#38c9bc] bg-[#1d6a64] dark:bg-[#38c9bc] text-white dark:text-[#0f1518]'
-                              : 'border-[#c7b9a5] dark:border-[#3a525d] bg-white dark:bg-[#131c20] text-transparent'
+                              ? 'border-[#166e64] dark:border-[#38c9bc] bg-[#166e64] dark:bg-[#38c9bc] text-white dark:text-[#0f1518]'
+                              : 'border-[#b8a994] dark:border-[#3a525d] bg-white dark:bg-[#131c20] text-transparent'
                           }`}
                         >
                           ✓
                         </div>
                       </div>
                       <div className="mt-2">
-                        <span className="block text-xs font-bold text-[#263e43] dark:text-[#e4efe9] leading-tight">
+                        <span className="block text-xs font-bold text-[#16202a] dark:text-[#e4efe9] leading-tight">
                           {label}
                         </span>
-                        <span className="mt-0.5 block text-[0.65rem] text-[#7b8179] dark:text-[#849791] leading-tight">
+                        <span className="mt-0.5 block text-[0.65rem] text-[#52636a] dark:text-[#849791] leading-tight font-medium">
                           {desc}
                         </span>
                       </div>
@@ -925,7 +925,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             <div className="mt-8 pt-6 border-t border-[#ede3cf] dark:border-[#27373f] grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Hunger Urgency */}
               <div>
-                <label className="text-xs font-bold text-[#263e43] dark:text-[#e4efe9] block mb-2">
+                <label className="text-xs font-bold text-[#16202a] dark:text-[#e4efe9] block mb-2">
                   Hunger Level:
                 </label>
                 <div className="flex flex-col gap-1.5">
@@ -939,12 +939,12 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                       }}
                       className={`flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold border transition text-left ${
                         hungerMode === mode.id
-                          ? 'border-[#1d6a64] dark:border-[#38c9bc] bg-[#e3f4ed] dark:bg-[#14322c] text-[#1d6a64] dark:text-[#38c9bc] font-bold shadow-xs'
-                          : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f7f2e8] dark:bg-[#131c20] text-[#5e564a] dark:text-[#a0b4ac] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
+                          ? 'border-[#166e64] dark:border-[#38c9bc] bg-[#def2ea] dark:bg-[#14322c] text-[#0f5c53] dark:text-[#38c9bc] font-bold shadow-xs'
+                          : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f8f3ea] dark:bg-[#131c20] text-[#33464e] dark:text-[#a0b4ac] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
                       }`}
                     >
                       <span>{mode.label}</span>
-                      <span className="text-[0.65rem] text-[#8c877b] dark:text-[#758983]">{mode.hint}</span>
+                      <span className="text-[0.65rem] text-[#61747d] dark:text-[#758983]">{mode.hint}</span>
                     </button>
                   ))}
                 </div>
@@ -952,7 +952,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 
               {/* Portions Multiplier */}
               <div>
-                <label className="text-xs font-bold text-[#263e43] dark:text-[#e4efe9] block mb-2">
+                <label className="text-xs font-bold text-[#16202a] dark:text-[#e4efe9] block mb-2">
                   Portion Size:
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -964,12 +964,12 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     }}
                     className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition ${
                       portionMultiplier === 1
-                        ? 'border-[#1d6a64] dark:border-[#38c9bc] bg-[#e3f4ed] dark:bg-[#14322c] text-[#1d6a64] dark:text-[#38c9bc] font-bold shadow-xs'
-                        : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f7f2e8] dark:bg-[#131c20] text-[#5e564a] dark:text-[#a0b4ac] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
+                        ? 'border-[#166e64] dark:border-[#38c9bc] bg-[#def2ea] dark:bg-[#14322c] text-[#0f5c53] dark:text-[#38c9bc] font-bold shadow-xs'
+                        : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f8f3ea] dark:bg-[#131c20] text-[#33464e] dark:text-[#a0b4ac] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
                     }`}
                   >
                     <span className="text-sm font-bold">1 Person</span>
-                    <span className="text-[0.65rem] text-[#7b8179] dark:text-[#758983]">Solo Survival</span>
+                    <span className="text-[0.65rem] text-[#52636a] dark:text-[#758983]">Solo Survival</span>
                   </button>
 
                   <button
@@ -980,14 +980,14 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     }}
                     className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition ${
                       portionMultiplier === 2
-                        ? 'border-[#1d6a64] dark:border-[#38c9bc] bg-[#e3f4ed] dark:bg-[#14322c] text-[#1d6a64] dark:text-[#38c9bc] font-bold shadow-xs'
-                        : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f7f2e8] dark:bg-[#131c20] text-[#5e564a] dark:text-[#a0b4ac] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
+                        ? 'border-[#166e64] dark:border-[#38c9bc] bg-[#def2ea] dark:bg-[#14322c] text-[#0f5c53] dark:text-[#38c9bc] font-bold shadow-xs'
+                        : 'border-[#ded4c1] dark:border-[#2c3d45] bg-[#f8f3ea] dark:bg-[#131c20] text-[#33464e] dark:text-[#a0b4ac] hover:bg-[#fffdf9] dark:hover:bg-[#182329]'
                     }`}
                   >
                     <span className="text-sm font-bold flex items-center gap-1">
                       <Users size={14} /> 2-3 People
                     </span>
-                    <span className="text-[0.65rem] text-[#7b8179] dark:text-[#758983]">Roommate Feast</span>
+                    <span className="text-[0.65rem] text-[#52636a] dark:text-[#758983]">Roommate Feast</span>
                   </button>
                 </div>
               </div>
@@ -995,9 +995,9 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 
             {/* Informational Status Note */}
             {statusNote && (
-              <div className="mt-4 flex items-center gap-2 text-xs text-[#8c6731] dark:text-[#e4b568] bg-[#fff9ea] dark:bg-[#2c2214] p-2.5 rounded-xl border border-[#eedab2] dark:border-[#4d381c]">
+              <div className="mt-4 flex items-center gap-2 text-xs text-[#854d0e] dark:text-[#e4b568] bg-[#fff9ea] dark:bg-[#2c2214] p-2.5 rounded-xl border border-[#eedab2] dark:border-[#4d381c]">
                 <Bot size={15} className="text-[#e65e3d]" />
-                <span>{statusNote}</span>
+                <span className="font-semibold">{statusNote}</span>
               </div>
             )}
 
@@ -1007,11 +1007,11 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 type="button"
                 onClick={fetchRecipes}
                 disabled={isLoading || ingredients.length === 0}
-                className="group relative flex h-14 w-full items-center justify-center gap-2.5 rounded-xl bg-[#e65e3d] px-6 text-base font-bold text-[#fff9ee] shadow-[0_5px_0_#b74731] transition-all hover:-translate-y-0.5 hover:bg-[#d95334] hover:shadow-[0_6px_0_#b74731] active:translate-y-0.5 active:shadow-[0_2px_0_#b74731] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                className="group relative flex h-14 w-full items-center justify-center gap-2.5 rounded-xl bg-[#e65e3d] px-6 text-base font-bold text-[#ffffff] shadow-[0_5px_0_#b74731] transition-all hover:-translate-y-0.5 hover:bg-[#d95334] hover:shadow-[0_6px_0_#b74731] active:translate-y-0.5 active:shadow-[0_2px_0_#b74731] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
               >
                 {isLoading ? (
                   <>
-                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#fff9ee]/30 border-t-[#fff9ee]" />
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                     <span>Cooking up foolproof instructions...</span>
                   </>
                 ) : (
@@ -1023,15 +1023,15 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 )}
               </button>
 
-              <div className="mt-3 flex items-center justify-center gap-4 text-[0.7rem] text-[#8c877b] dark:text-[#849791]">
+              <div className="mt-3 flex items-center justify-center gap-4 text-[0.7rem] text-[#52636a] dark:text-[#849791] font-semibold">
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={12} className="text-[#1d6a64] dark:text-[#38c9bc]" /> 2 Simple Options
+                  <CheckCircle2 size={12} className="text-[#166e64] dark:text-[#38c9bc]" /> 2 Simple Options
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={12} className="text-[#1d6a64] dark:text-[#38c9bc]" /> No Fancy Jargon
+                  <CheckCircle2 size={12} className="text-[#166e64] dark:text-[#38c9bc]" /> No Fancy Jargon
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={12} className="text-[#1d6a64] dark:text-[#38c9bc]" /> Zero Waste
+                  <CheckCircle2 size={12} className="text-[#166e64] dark:text-[#38c9bc]" /> Zero Waste
                 </span>
               </div>
             </div>
@@ -1048,10 +1048,10 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 <Flame size={32} />
               </div>
             </div>
-            <h3 className="mt-4 font-serif text-lg font-bold text-[#1e3038] dark:text-[#f3eee4]">
+            <h3 className="mt-4 font-serif text-lg font-bold text-[#16202a] dark:text-[#f3eee4]">
               {LOADING_MESSAGES[loadingMsgIndex]}
             </h3>
-            <p className="mt-1 text-xs text-[#747e7a] dark:text-[#8ca199]">
+            <p className="mt-1 text-xs text-[#52636a] dark:text-[#8ca199] font-medium">
               Hang tight! Your hunger is about to be solved.
             </p>
           </div>
@@ -1063,11 +1063,11 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             <div>
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-[#ded4c1] dark:border-[#27373f] pb-4">
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1d6a64] dark:text-[#38c9bc]">
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#166e64] dark:text-[#38c9bc]">
                     <Sparkles size={14} />
                     <span>Your Survival Menu</span>
                   </div>
-                  <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-extrabold text-[#1e3038] dark:text-[#f3eee4]">
+                  <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-extrabold text-[#16202a] dark:text-[#f3eee4]">
                     Pick what looks easiest:
                   </h2>
                 </div>
@@ -1077,7 +1077,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     setRecipes([]);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="flex items-center gap-1.5 text-xs font-bold text-[#68716d] dark:text-[#8fa39b] hover:text-[#e65e3d] transition w-fit"
+                  className="flex items-center gap-1.5 text-xs font-bold text-[#52636a] dark:text-[#8fa39b] hover:text-[#e65e3d] transition w-fit"
                 >
                   <RotateCcw size={14} />
                   <span>Start over</span>
@@ -1090,15 +1090,15 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                   const isFirst = index === 0;
                   const themeColors = isFirst
                     ? {
-                        headerBg: 'bg-[#e3f4ed] dark:bg-[#132c26]',
-                        accentInk: 'text-[#1d6a64] dark:text-[#38c9bc]',
-                        border: 'border-[#bfe2d4] dark:border-[#234d43]',
+                        headerBg: 'bg-[#def2ea] dark:bg-[#132c26]',
+                        accentInk: 'text-[#0f5c53] dark:text-[#38c9bc]',
+                        border: 'border-[#b2ded0] dark:border-[#234d43]',
                         badge: 'The Easiest One',
                       }
                     : {
-                        headerBg: 'bg-[#faeed9] dark:bg-[#2a1e14]',
-                        accentInk: 'text-[#ad622a] dark:text-[#f39c5a]',
-                        border: 'border-[#ebd4b1] dark:border-[#4d3623]',
+                        headerBg: 'bg-[#faedd7] dark:bg-[#2a1e14]',
+                        accentInk: 'text-[#9e5218] dark:text-[#f39c5a]',
+                        border: 'border-[#ebd2ad] dark:border-[#4d3623]',
                         badge: 'The Flavor Upgrade',
                       };
 
@@ -1118,29 +1118,29 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         <div className={`p-4 sm:p-5 ${themeColors.headerBg} border-b ${themeColors.border}`}>
                           <div className="flex items-center justify-between gap-2">
                             <span
-                              className={`rounded-full px-2.5 py-0.5 text-[0.68rem] font-extrabold uppercase tracking-wider ${themeColors.accentInk} bg-white/80 dark:bg-black/30 border border-current/20`}
+                              className={`rounded-full px-2.5 py-0.5 text-[0.68rem] font-extrabold uppercase tracking-wider ${themeColors.accentInk} bg-white/90 dark:bg-black/40 border border-current/20 shadow-2xs`}
                             >
                               {themeColors.badge}
                             </span>
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-[#5f6c68] dark:text-[#95aaa2]">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-[#4b5d65] dark:text-[#b4cbbf]">
                               <Clock size={14} className={themeColors.accentInk} />
                               <span>{recipe.prepTime}</span>
                             </div>
                           </div>
 
-                          <h3 className="mt-3 font-serif text-xl sm:text-2xl font-bold leading-tight text-[#1e3038] dark:text-[#f3eee4]">
+                          <h3 className="mt-3 font-serif text-xl sm:text-2xl font-bold leading-tight text-[#16202a] dark:text-[#f3eee4]">
                             {recipe.recipeName}
                           </h3>
 
                           {/* Equipment Needed Tags */}
                           <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                            <span className="text-[0.68rem] font-bold text-[#747e7a] dark:text-[#8ba098] uppercase tracking-wide mr-1">
+                            <span className="text-[0.68rem] font-bold text-[#52636a] dark:text-[#8ba098] uppercase tracking-wide mr-1">
                               Equipment:
                             </span>
                             {recipe.equipmentNeeded.map((eq) => (
                               <span
                                 key={eq}
-                                className="rounded-md bg-white/90 dark:bg-[#11191d] px-2 py-0.5 text-[0.7rem] font-semibold text-[#374944] dark:text-[#cde0d9] border border-[#ded4c1] dark:border-[#2c3f47]"
+                                className="rounded-md bg-white dark:bg-[#11191d] px-2 py-0.5 text-[0.7rem] font-bold text-[#2c3d44] dark:text-[#cde0d9] border border-[#ded4c1] dark:border-[#2c3f47]"
                               >
                                 {eq}
                               </span>
@@ -1149,17 +1149,17 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         </div>
 
                         {/* Missing Ingredients Warning / Good to Go */}
-                        <div className="px-5 py-3 border-b border-[#ded4c1]/60 dark:border-[#233238] bg-[#f7f2e8] dark:bg-[#12191d]">
+                        <div className="px-5 py-3 border-b border-[#ded4c1]/60 dark:border-[#233238] bg-[#f8f3ea] dark:bg-[#12191d]">
                           {recipe.missingIngredients && recipe.missingIngredients.length > 0 ? (
-                            <div className="flex items-start gap-2 text-xs text-[#8c6731] dark:text-[#e4b360]">
-                              <Info size={14} className="shrink-0 mt-0.5 text-[#ad622a] dark:text-[#f39c5a]" />
+                            <div className="flex items-start gap-2 text-xs text-[#854d0e] dark:text-[#fcd34d] font-semibold">
+                              <Info size={14} className="shrink-0 mt-0.5 text-[#9e5218] dark:text-[#f39c5a]" />
                               <span>
                                 <strong>Missing / Optional:</strong>{' '}
                                 {recipe.missingIngredients.join(', ')}
                               </span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#1d6a64] dark:text-[#38c9bc]">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc]">
                               <CheckCircle2 size={14} />
                               <span>All ingredients ready! No extra groceries needed.</span>
                             </div>
@@ -1169,10 +1169,10 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         {/* Idiot-Proof Steps Preview */}
                         <div className="p-5">
                           <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#8b8170] dark:text-[#8ea39b]">
+                            <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#5c6f77] dark:text-[#9bb0a8]">
                               Idiot-Proof Step-by-Step:
                             </h4>
-                            <span className="text-[0.65rem] text-[#8c877b] dark:text-[#7f948c]">
+                            <span className="text-[0.65rem] text-[#61747d] dark:text-[#7f948c] font-bold">
                               {recipe.idiotProofSteps.length} easy steps
                             </span>
                           </div>
@@ -1181,7 +1181,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                             {recipe.idiotProofSteps.map((step, sIdx) => (
                               <li
                                 key={sIdx}
-                                className="flex items-start gap-3 text-sm leading-snug text-[#3d4b47] dark:text-[#cde0d9]"
+                                className="flex items-start gap-3 text-sm leading-snug text-[#273840] dark:text-[#e2eee9] font-medium"
                               >
                                 <span
                                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.65rem] font-bold ${themeColors.headerBg} ${themeColors.accentInk} border ${themeColors.border} mt-0.5`}
@@ -1198,7 +1198,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                             <button
                               type="button"
                               onClick={() => setExpandedHackIndex(isHackOpen ? null : index)}
-                              className="flex w-full items-center justify-between text-xs font-bold text-[#1d6a64] dark:text-[#38c9bc] hover:text-[#15524d] transition"
+                              className="flex w-full items-center justify-between text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc] hover:text-[#166e64] transition"
                             >
                               <span className="flex items-center gap-1.5">
                                 <Lightbulb size={14} className="text-[#e65e3d]" />
@@ -1208,17 +1208,17 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                             </button>
 
                             {isHackOpen && (
-                              <div className="mt-3 space-y-2 rounded-xl bg-[#e3f4ed]/80 dark:bg-[#132c26]/60 p-3 text-xs text-[#2c4e43] dark:text-[#b4d0c7] border border-[#bfe2d4] dark:border-[#224b41] animate-in fade-in duration-200">
+                              <div className="mt-3 space-y-2 rounded-xl bg-[#def2ea] dark:bg-[#132c26]/60 p-3 text-xs text-[#1b433b] dark:text-[#c4ded6] border border-[#b2ded0] dark:border-[#224b41] animate-in fade-in duration-200">
                                 <div>
-                                  <strong className="block text-[#1d6a64] dark:text-[#38c9bc] font-bold">💡 Kitchen Hack:</strong>
-                                  <p className="mt-0.5 text-[#3a584f] dark:text-[#a0beb4]">
+                                  <strong className="block text-[#0f5c53] dark:text-[#38c9bc] font-bold">💡 Kitchen Hack:</strong>
+                                  <p className="mt-0.5 font-medium">
                                     {recipe.jugaadHack || 'No spatula? Use the flat bottom of a glass to flip and press toast.'}
                                   </p>
                                 </div>
                                 {recipe.substitutions && recipe.substitutions.length > 0 && (
-                                  <div className="pt-2 border-t border-[#bfe2d4] dark:border-[#224b41]">
-                                    <strong className="block text-[#1d6a64] dark:text-[#38c9bc] font-bold">🔄 Substitutions:</strong>
-                                    <ul className="mt-1 list-disc list-inside space-y-0.5 text-[#3a584f] dark:text-[#a0beb4]">
+                                  <div className="pt-2 border-t border-[#b2ded0] dark:border-[#224b41]">
+                                    <strong className="block text-[#0f5c53] dark:text-[#38c9bc] font-bold">🔄 Substitutions:</strong>
+                                    <ul className="mt-1 list-disc list-inside space-y-0.5 font-medium">
                                       {recipe.substitutions.map((sub, i) => (
                                         <li key={i}>{sub}</li>
                                       ))}
@@ -1232,11 +1232,11 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                       </div>
 
                       {/* Card Action Buttons */}
-                      <div className="p-4 border-t border-[#ded4c1] dark:border-[#27373f] bg-[#f7f2e8] dark:bg-[#131c20] flex items-center justify-between gap-2">
+                      <div className="p-4 border-t border-[#ded4c1] dark:border-[#27373f] bg-[#f8f3ea] dark:bg-[#131c20] flex items-center justify-between gap-2">
                         <button
                           type="button"
                           onClick={() => handleStartCooking(recipe)}
-                          className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#1d6a64] dark:bg-[#207c72] py-2 px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#15524d] active:scale-95"
+                          className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#166e64] dark:bg-[#207c72] py-2 px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#115e54] active:scale-95"
                         >
                           <Play size={14} />
                           <span>Start Cooking Mode</span>
@@ -1245,13 +1245,13 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         <button
                           type="button"
                           onClick={() => handleCopyRecipe(recipe, index)}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-[#ded4c1] dark:border-[#2c3f47] bg-[#fffdf9] dark:bg-[#182328] px-3 py-2 text-xs font-semibold text-[#485854] dark:text-[#b4cbbf] transition hover:border-[#1d6a64] hover:text-[#1d6a64] shrink-0"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-[#ded4c1] dark:border-[#2c3f47] bg-[#fffdf9] dark:bg-[#182328] px-3 py-2 text-xs font-semibold text-[#374950] dark:text-[#b4cbbf] transition hover:border-[#166e64] hover:text-[#166e64] shrink-0"
                           title="Copy recipe text to clipboard"
                         >
                           {copiedIndex === index ? (
                             <>
-                              <Check size={14} className="text-[#1d6a64] dark:text-[#38c9bc]" />
-                              <span className="text-[#1d6a64] dark:text-[#38c9bc] font-bold">Copied!</span>
+                              <Check size={14} className="text-[#0f5c53] dark:text-[#38c9bc]" />
+                              <span className="text-[#0f5c53] dark:text-[#38c9bc] font-bold">Copied!</span>
                             </>
                           ) : (
                             <>
@@ -1274,7 +1274,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 left-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-[#1e3038] dark:bg-[#1e2c33] border border-transparent dark:border-[#384f5a] text-white shadow-lg transition hover:bg-[#e65e3d] hover:scale-110 active:scale-95 animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-6 left-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-[#16202a] dark:bg-[#1e2c33] border border-transparent dark:border-[#384f5a] text-white shadow-lg transition hover:bg-[#e65e3d] hover:scale-110 active:scale-95 animate-in fade-in slide-in-from-bottom-4 duration-200"
           title="Scroll back to top"
         >
           <ArrowUp size={18} />
@@ -1285,9 +1285,9 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       {/* Full-Screen Interactive Cooking Mode Modal */}
       {/* ========================================== */}
       {activeCookingRecipe && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#f6f1e7] dark:bg-[#0e1417] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 transition-colors">
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#f8f5ee] dark:bg-[#0e1417] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 transition-colors">
           {/* Top Sticky Header */}
-          <div className="sticky top-0 z-10 border-b border-[#ded4c1] dark:border-[#27373f] bg-[#f8f3ea]/95 dark:bg-[#151e22]/95 px-4 py-3 sm:px-8 backdrop-blur-md flex items-center justify-between shadow-xs">
+          <div className="sticky top-0 z-10 border-b border-[#ded4c1] dark:border-[#27373f] bg-[#f8f5ee]/95 dark:bg-[#151e22]/95 px-4 py-3 sm:px-8 backdrop-blur-md flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e65e3d] text-white shadow-xs">
                 <ChefHat size={20} />
@@ -1296,7 +1296,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 <span className="text-[0.68rem] font-bold uppercase tracking-wider text-[#e65e3d]">
                   Live Cooking Companion
                 </span>
-                <h2 className="font-serif text-base sm:text-lg font-bold text-[#1e3038] dark:text-[#f3eee4] line-clamp-1">
+                <h2 className="font-serif text-base sm:text-lg font-bold text-[#16202a] dark:text-[#f3eee4] line-clamp-1">
                   {activeCookingRecipe.recipeName}
                 </h2>
               </div>
@@ -1304,12 +1304,12 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 
             <div className="flex items-center gap-3">
               {/* Step Progress Pill */}
-              <span className="rounded-full bg-[#1d6a64]/10 dark:bg-[#1d6a64]/30 px-3 py-1 text-xs font-bold text-[#1d6a64] dark:text-[#38c9bc]">
+              <span className="rounded-full bg-[#def2ea] dark:bg-[#1d6a64]/30 px-3 py-1 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc]">
                 {completedSteps.length} / {activeCookingRecipe.idiotProofSteps.length} Steps
               </span>
               <button
                 onClick={() => setActiveCookingRecipe(null)}
-                className="rounded-xl border border-[#ded4c1] dark:border-[#2d4048] bg-[#fffdf9] dark:bg-[#1a252a] p-2 text-[#68716d] dark:text-[#a0b3ac] hover:bg-[#ded4c1]/50 dark:hover:bg-[#25363e] hover:text-[#1e3038] transition"
+                className="rounded-xl border border-[#ded4c1] dark:border-[#2d4048] bg-[#fffdf9] dark:bg-[#1a252a] p-2 text-[#52636a] dark:text-[#a0b3ac] hover:bg-[#ded4c1]/50 dark:hover:bg-[#25363e] hover:text-[#16202a] transition"
                 title="Exit Cooking Mode"
               >
                 <X size={18} />
@@ -1323,7 +1323,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               {/* Visual Step Progress Bar */}
               <div className="mb-6 h-2 w-full rounded-full bg-[#ded4c1] dark:bg-[#202d33] overflow-hidden">
                 <div
-                  className="h-full bg-[#1d6a64] dark:bg-[#38c9bc] transition-all duration-300 ease-out"
+                  className="h-full bg-[#166e64] dark:bg-[#38c9bc] transition-all duration-300 ease-out"
                   style={{
                     width: `${(completedSteps.length / activeCookingRecipe.idiotProofSteps.length) * 100}%`,
                   }}
@@ -1331,7 +1331,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               </div>
 
               {/* Quick Reassurance Banner */}
-              <div className="mb-6 flex items-center gap-2 rounded-xl bg-[#e3f4ed] dark:bg-[#133029] p-3 text-xs font-semibold text-[#1d6a64] dark:text-[#38c9bc] border border-[#bfe2d4] dark:border-[#224f44]">
+              <div className="mb-6 flex items-center gap-2 rounded-xl bg-[#def2ea] dark:bg-[#133029] p-3 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc] border border-[#b2ded0] dark:border-[#224f44]">
                 <ShieldCheck size={16} />
                 <span>Tap each step to check it off. Take your time—no rush!</span>
               </div>
@@ -1346,16 +1346,16 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                       onClick={() => toggleStepCompleted(idx)}
                       className={`group flex cursor-pointer items-start gap-4 rounded-2xl border p-4 sm:p-5 transition-all duration-200 select-none ${
                         isDone
-                          ? 'border-[#1d6a64] dark:border-[#38c9bc] bg-[#e3f4ed] dark:bg-[#14322b] shadow-xs'
-                          : 'border-[#ded4c1] dark:border-[#27373f] bg-[#fffdf9] dark:bg-[#162126] hover:border-[#1d6a64]/50 dark:hover:border-[#38c9bc]/50 hover:shadow-sm'
+                          ? 'border-[#166e64] dark:border-[#38c9bc] bg-[#def2ea] dark:bg-[#14322b] shadow-xs'
+                          : 'border-[#ded4c1] dark:border-[#27373f] bg-[#fffdf9] dark:bg-[#162126] hover:border-[#166e64]/50 dark:hover:border-[#38c9bc]/50 hover:shadow-sm'
                       }`}
                     >
                       {/* Checkbox circle */}
                       <div
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors mt-0.5 ${
                           isDone
-                            ? 'border-[#1d6a64] dark:border-[#38c9bc] bg-[#1d6a64] dark:bg-[#38c9bc] text-white dark:text-[#0f1518] shadow-xs scale-105'
-                            : 'border-[#c7b9a5] dark:border-[#3b505a] bg-[#fffdf9] dark:bg-[#11181c] text-transparent group-hover:border-[#1d6a64]'
+                            ? 'border-[#166e64] dark:border-[#38c9bc] bg-[#166e64] dark:bg-[#38c9bc] text-white dark:text-[#0f1518] shadow-xs scale-105'
+                            : 'border-[#b8a994] dark:border-[#3b505a] bg-[#fffdf9] dark:bg-[#11181c] text-transparent group-hover:border-[#166e64]'
                         }`}
                       >
                         <Check size={16} strokeWidth={3} />
@@ -1366,20 +1366,20 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         <div className="flex items-center justify-between">
                           <span
                             className={`text-xs font-extrabold uppercase tracking-wide ${
-                              isDone ? 'text-[#1d6a64] dark:text-[#38c9bc]' : 'text-[#8c877b] dark:text-[#7f948c]'
+                              isDone ? 'text-[#0f5c53] dark:text-[#38c9bc]' : 'text-[#5c6f77] dark:text-[#7f948c]'
                             }`}
                           >
                             Step {idx + 1}
                           </span>
                           {isDone && (
-                            <span className="text-[0.65rem] font-bold text-[#1d6a64] dark:text-[#38c9bc] uppercase flex items-center gap-1">
+                            <span className="text-[0.65rem] font-bold text-[#0f5c53] dark:text-[#38c9bc] uppercase flex items-center gap-1">
                               <CheckCheck size={12} /> Done!
                             </span>
                           )}
                         </div>
                         <p
-                          className={`mt-1 text-base sm:text-lg leading-relaxed font-medium transition ${
-                            isDone ? 'line-through text-[#6f847d] dark:text-[#6a8077]' : 'text-[#263e43] dark:text-[#e4efe9]'
+                          className={`mt-1 text-base sm:text-lg leading-relaxed font-semibold transition ${
+                            isDone ? 'line-through text-[#6a8077] dark:text-[#6a8077]' : 'text-[#1e3038] dark:text-[#e4efe9]'
                           }`}
                         >
                           {step}
@@ -1393,7 +1393,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               {/* Live Kitchen Stopwatch / Quick Timers Widget */}
               <div className="mt-8 rounded-2xl border border-[#ded4c1] dark:border-[#27373f] bg-[#fffdf9] dark:bg-[#162126] p-5 shadow-xs">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2 text-sm font-bold text-[#263e43] dark:text-[#e4efe9]">
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#16202a] dark:text-[#e4efe9]">
                     <TimerIcon size={18} className="text-[#e65e3d]" />
                     <span>Kitchen Countdown Timer</span>
                   </div>
@@ -1407,19 +1407,19 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => startTimer(60)}
-                    className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] bg-[#f7f2e8] dark:bg-[#11181c] px-3 py-1.5 text-xs font-bold text-[#5e564a] dark:text-[#a0b4ac] hover:bg-[#1d6a64] hover:text-white transition active:scale-95"
+                    className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] bg-[#f8f3ea] dark:bg-[#11181c] px-3 py-1.5 text-xs font-bold text-[#33464e] dark:text-[#c5d8d0] hover:bg-[#166e64] hover:text-white transition active:scale-95"
                   >
                     + 1 Min
                   </button>
                   <button
                     onClick={() => startTimer(120)}
-                    className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] bg-[#f7f2e8] dark:bg-[#11181c] px-3 py-1.5 text-xs font-bold text-[#5e564a] dark:text-[#a0b4ac] hover:bg-[#1d6a64] hover:text-white transition active:scale-95"
+                    className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] bg-[#f8f3ea] dark:bg-[#11181c] px-3 py-1.5 text-xs font-bold text-[#33464e] dark:text-[#c5d8d0] hover:bg-[#166e64] hover:text-white transition active:scale-95"
                   >
                     + 2 Min
                   </button>
                   <button
                     onClick={() => startTimer(300)}
-                    className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] bg-[#f7f2e8] dark:bg-[#11181c] px-3 py-1.5 text-xs font-bold text-[#5e564a] dark:text-[#a0b4ac] hover:bg-[#1d6a64] hover:text-white transition active:scale-95"
+                    className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] bg-[#f8f3ea] dark:bg-[#11181c] px-3 py-1.5 text-xs font-bold text-[#33464e] dark:text-[#c5d8d0] hover:bg-[#166e64] hover:text-white transition active:scale-95"
                   >
                     + 5 Min
                   </button>
@@ -1428,7 +1428,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     <div className="ml-auto flex items-center gap-2">
                       <button
                         onClick={() => setIsTimerRunning(!isTimerRunning)}
-                        className="rounded-lg bg-[#1d6a64] dark:bg-[#207c72] px-3 py-1.5 text-xs font-bold text-white shadow-xs"
+                        className="rounded-lg bg-[#166e64] dark:bg-[#207c72] px-3 py-1.5 text-xs font-bold text-white shadow-xs"
                       >
                         {isTimerRunning ? <Pause size={14} /> : <Play size={14} />}
                       </button>
@@ -1437,7 +1437,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                           setTimerSeconds(null);
                           setIsTimerRunning(false);
                         }}
-                        className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] px-2 py-1.5 text-xs text-[#8c877b] dark:text-[#7f948c] hover:text-[#e65e3d]"
+                        className="rounded-lg border border-[#ded4c1] dark:border-[#2d4048] px-2 py-1.5 text-xs text-[#52636a] dark:text-[#7f948c] hover:text-[#e65e3d] font-bold"
                       >
                         Reset
                       </button>
@@ -1449,10 +1449,10 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 
             {/* Finish Celebration Card */}
             {completedSteps.length === activeCookingRecipe.idiotProofSteps.length && (
-              <div className="mt-8 rounded-2xl bg-[#1d6a64] dark:bg-[#163a33] p-6 text-center text-white shadow-xl animate-in zoom-in-95 duration-300">
+              <div className="mt-8 rounded-2xl bg-[#166e64] dark:bg-[#163a33] p-6 text-center text-white shadow-xl animate-in zoom-in-95 duration-300">
                 <Award size={36} className="mx-auto text-[#f4c453] mb-2" />
                 <h3 className="font-serif text-2xl font-bold">You did it! 🎉</h3>
-                <p className="mt-1 text-sm text-[#e3f4ed] max-w-md mx-auto">
+                <p className="mt-1 text-sm text-[#def2ea] max-w-md mx-auto font-medium">
                   You successfully cooked <span className="font-bold underline">{activeCookingRecipe.recipeName}</span> without panic. Time to eat!
                 </p>
                 <button
@@ -1460,7 +1460,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     fireConfetti(2000);
                     setActiveCookingRecipe(null);
                   }}
-                  className="mt-5 rounded-xl bg-[#f4c453] px-6 py-2.5 text-sm font-bold text-[#1e3038] shadow-md transition hover:bg-[#f3bc3e] active:scale-95"
+                  className="mt-5 rounded-xl bg-[#f4c453] px-6 py-2.5 text-sm font-bold text-[#16202a] shadow-md transition hover:bg-[#f3bc3e] active:scale-95"
                 >
                   Done Cooking & Return
                 </button>
@@ -1475,16 +1475,16 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       {/* ========================================== */}
       {installPrompt && !isAppInstalled && !isBannerDismissed && (
         <div className="fixed bottom-4 right-4 z-40 max-w-sm w-[calc(100vw-2rem)] sm:w-auto animate-in fade-in slide-in-from-bottom-5 duration-300">
-          <div className="flex items-center justify-between gap-3 rounded-2xl border-2 border-[#1d6a64] dark:border-[#38c9bc] bg-[#fffdf9] dark:bg-[#162126] p-3.5 shadow-xl">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border-2 border-[#166e64] dark:border-[#38c9bc] bg-[#fffdf9] dark:bg-[#162126] p-3.5 shadow-xl">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e65e3d] text-white shadow-xs">
                 <Smartphone size={18} />
               </div>
               <div className="pr-1">
-                <p className="text-xs font-extrabold text-[#1e3038] dark:text-[#f3eee4]">
+                <p className="text-xs font-extrabold text-[#16202a] dark:text-[#f3eee4]">
                   Install App
                 </p>
-                <p className="text-[0.68rem] text-[#69736f] dark:text-[#8ca199] leading-tight">
+                <p className="text-[0.68rem] text-[#52636a] dark:text-[#8ca199] leading-tight font-medium">
                   1-click kitchen survival on your home screen
                 </p>
               </div>
@@ -1500,13 +1500,13 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                     setInstallPrompt(null);
                   }
                 }}
-                className="rounded-xl bg-[#1d6a64] dark:bg-[#207c72] px-3 py-1.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#15524d] active:scale-95"
+                className="rounded-xl bg-[#166e64] dark:bg-[#207c72] px-3 py-1.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#115e54] active:scale-95"
               >
                 Install
               </button>
               <button
                 onClick={handleDismissInstall}
-                className="rounded-lg p-1 text-[#8c877b] dark:text-[#7d928b] hover:bg-[#ded4c1]/50 dark:hover:bg-[#25363e] hover:text-[#1e3038] transition"
+                className="rounded-lg p-1 text-[#61747d] dark:text-[#7d928b] hover:bg-[#ded4c1]/50 dark:hover:bg-[#25363e] hover:text-[#16202a] transition"
                 title="Dismiss permanently"
               >
                 <X size={15} />
@@ -1519,12 +1519,12 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       {/* ========================================== */}
       {/* FOOTER */}
       {/* ========================================== */}
-      <footer className="mt-20 border-t border-[#ded4c1] dark:border-[#27373f] bg-[#f8f3ea] dark:bg-[#151e22] py-8 text-center text-xs text-[#8a887d] dark:text-[#7a8e87] transition-colors">
+      <footer className="relative z-10 mt-20 border-t border-[#ded4c1] dark:border-[#27373f] bg-[#f8f5ee] dark:bg-[#151e22] py-8 text-center text-xs text-[#52636a] dark:text-[#7a8e87] transition-colors">
         <div className="mx-auto max-w-6xl px-4">
-          <p className="font-semibold text-[#5a6764] dark:text-[#9bb0a8]">
+          <p className="font-semibold text-[#374950] dark:text-[#9bb0a8]">
             JugaadBites: The Idiot-Proof Recipe Finder
           </p>
-          <p className="mt-1 text-[0.7rem]">
+          <p className="mt-1 text-[0.7rem] text-[#61747d] dark:text-[#7a8e87]">
             Built with React, Vite, Tailwind CSS & Google Gemini 1.5 Flash • PWA Installable.
           </p>
         </div>

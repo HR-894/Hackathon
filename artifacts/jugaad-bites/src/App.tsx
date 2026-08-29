@@ -13,7 +13,6 @@ import {
   Plus,
   ArrowRight,
   RotateCcw,
-  KeyRound,
   ChefHat,
   HeartHandshake,
   ShieldCheck,
@@ -34,7 +33,6 @@ import {
   ChevronDown,
   ChevronUp,
   Award,
-  ExternalLink,
   Bot,
   ArrowUp,
   Activity,
@@ -328,12 +326,6 @@ export default function App() {
     return (typeof window !== 'undefined' && localStorage.getItem('jugaad_pwa_dismissed') === 'true') || false;
   });
 
-  // State: API Key Storage
-  const [customKey, setCustomKey] = useState<string>(() => {
-    return (typeof window !== 'undefined' && localStorage.getItem('jugaad_gemini_key')) || '';
-  });
-  const [showKeyModal, setShowKeyModal] = useState<boolean>(false);
-
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -470,16 +462,6 @@ export default function App() {
     setIsMuted(muted);
   };
 
-  const handleSaveKey = (key: string) => {
-    const trimmed = key.trim();
-    setCustomKey(trimmed);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('jugaad_gemini_key', trimmed);
-    }
-    setShowKeyModal(false);
-    sounds.playSuccess();
-  };
-
   const handleDismissInstall = () => {
     setIsBannerDismissed(true);
     if (typeof window !== 'undefined') {
@@ -500,7 +482,7 @@ export default function App() {
     e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
   };
 
-  // Fetch Logic
+  // Fetch Logic (Reads environment variables seamlessly)
   const fetchRecipes = async () => {
     if (ingredients.length === 0) {
       inputRef.current?.focus();
@@ -516,7 +498,6 @@ export default function App() {
     setLoadingMsgIndex(0);
 
     const apiKey =
-      customKey.trim() ||
       (import.meta as unknown as { env: Record<string, string> }).env?.VITE_GEMINI_API_KEY ||
       '';
 
@@ -554,7 +535,7 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
               jugaadHack:
                 rec.jugaadHack ||
                 (i === 0
-                  ? 'No chopping board? Tear soft veggies with clean hands or cut against a tiffin lid.'
+                  ? 'No chopping board? Tear soft veggies with clean hands or cut against a flat tiffin lid.'
                   : 'No strainer? Hold the lid slightly tilted over the pan to drain excess water.'),
               substitutions: rec.substitutions || [
                 'No butter? 1 teaspoon cooking oil or ghee works equally well.',
@@ -744,18 +725,6 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 <span className="sm:hidden">Install</span>
               </button>
             )}
-
-            {/* Gemini API Key Settings Button */}
-            <button
-              onClick={() => setShowKeyModal(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-[#ded4c1] dark:border-[#2a3c45] bg-[#fffdf9] dark:bg-[#192429] px-3 py-1.5 text-xs font-semibold text-[#52635e] dark:text-[#a2b5ae] transition hover:border-[#1d6a64] hover:text-[#1d6a64] dark:hover:text-[#38c9bc]"
-              title="Configure Free Gemini AI Key"
-            >
-              <KeyRound size={14} className={customKey ? 'text-[#1d6a64] dark:text-[#38c9bc]' : 'text-[#8b7560] dark:text-[#7d9089]'} />
-              <span className="hidden sm:inline">
-                {customKey ? 'AI Connected' : 'Free AI Key'}
-              </span>
-            </button>
           </div>
         </div>
       </header>
@@ -1542,95 +1511,6 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               >
                 <X size={15} />
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================== */}
-      {/* 1-Click Free Gemini API Key Modal */}
-      {/* ========================================== */}
-      {showKeyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-lg rounded-2xl border border-[#ded4c1] dark:border-[#27373f] bg-[#fffdf9] dark:bg-[#162126] p-6 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#e65e3d] text-white">
-                  <KeyRound size={16} />
-                </div>
-                <h3 className="font-serif text-lg sm:text-xl font-bold text-[#1e3038] dark:text-[#f3eee4]">
-                  Connect Free Gemini AI Engine
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowKeyModal(false)}
-                className="rounded-lg p-1.5 text-[#8c877b] dark:text-[#7f948c] hover:bg-[#ded4c1]/50 dark:hover:bg-[#25363e] hover:text-[#1e3038] transition"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="mt-4 space-y-3 text-xs leading-relaxed text-[#5f6c68] dark:text-[#9bb0a8]">
-              <div className="rounded-xl bg-[#e3f4ed] dark:bg-[#14322c] p-3 text-[#1d6a64] dark:text-[#38c9bc] border border-[#bfe2d4] dark:border-[#224f44]">
-                <strong>💡 Non-Tech Friendly:</strong> Google AI Studio provides a free API key with 15 free requests per minute. No credit card or cloud setup is needed!
-              </div>
-
-              <p>
-                1. Click the button below to open Google AI Studio in a new tab.<br />
-                2. Click <strong>&quot;Create API Key&quot;</strong> and copy it.<br />
-                3. Paste it here. It is saved in your browser&apos;s local storage.
-              </p>
-
-              <a
-                href="https://aistudio.google.com/app/apikey"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#e65e3d] hover:underline"
-              >
-                <span>👉 Get Free Gemini API Key from Google AI Studio</span>
-                <ExternalLink size={12} />
-              </a>
-            </div>
-
-            <div className="mt-5">
-              <label className="block text-xs font-bold text-[#263e43] dark:text-[#e4efe9] mb-1.5">
-                Paste Google Gemini API Key:
-              </label>
-              <input
-                type="password"
-                value={customKey}
-                onChange={(e) => setCustomKey(e.target.value)}
-                placeholder="AIzaSy..."
-                className="h-11 w-full rounded-xl border border-[#d8c9b1] dark:border-[#2c3e46] bg-white dark:bg-[#11181c] px-3.5 text-sm text-[#263e43] dark:text-[#e4efe9] outline-none focus:border-[#1d6a64] dark:focus:border-[#38c9bc] focus:ring-2 focus:ring-[#1d6a64]/20 font-mono placeholder:font-sans"
-              />
-            </div>
-
-            <div className="mt-6 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => {
-                  handleSaveKey('');
-                }}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#8c877b] dark:text-[#7f948c] hover:text-[#e65e3d] transition"
-              >
-                Clear Key
-              </button>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowKeyModal(false)}
-                  className="rounded-xl border border-[#ded4c1] dark:border-[#2d4048] px-4 py-2 text-xs font-semibold text-[#5e564a] dark:text-[#a0b4ac] hover:bg-[#ded4c1]/50 dark:hover:bg-[#202d33]"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSaveKey(customKey)}
-                  className="rounded-xl bg-[#1d6a64] dark:bg-[#207c72] px-5 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-[#15524d] active:scale-95"
-                >
-                  Save & Connect AI
-                </button>
-              </div>
             </div>
           </div>
         </div>

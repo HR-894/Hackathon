@@ -1,68 +1,127 @@
-# JugaadBites
+# 🍳 JugaadBites: The Idiot-Proof Recipe Finder
 
-JugaadBites is a hostel survival recipe application. It helps you turn whatever random ingredients you have left into a decent meal using limited equipment.
+> **Terrified of the kitchen? We got you covered.**  
+> *JugaadBites turns whatever random ingredients survived in your hostel room into foolproof, zero-panic meals with step-by-step hand-holding.*
 
-## Repository Structure
+---
 
-This is a monorepo managed with `pnpm` workspaces. It contains the following packages:
-- `artifacts/jugaad-bites`: The main frontend application (React/Vite).
-- `artifacts/api-server`: The backend Express API server.
-- `lib/api-client-react`: React hooks and HTTP client to fetch data from the API.
-- `lib/api-zod`: Shared validation schemas.
-- `lib/db`: Database schema and connection logic (PostgreSQL/Drizzle).
+## 🌟 What is JugaadBites?
 
-## Getting Started
+Most recipe apps are built for seasoned chefs—they demand fancy spices, expensive equipment, and confuse beginners with terms like *"sauté on medium simmer"* or *"fold the emulsification"*.
 
-### Prerequisites
+**JugaadBites is designed for absolute kitchen beginners and hostel students.** You throw in whatever random food items you have (bread, eggs, butter, Maggi, onions, cheese), select your available tools (even if it's just an electric kettle or no flame at all), and get **2 dead-simple survival recipes** in plain English with zero jargon.
 
-You will need the following installed:
-- Node.js (v18 or higher recommended)
-- `pnpm` (install globally via `npm install -g pnpm`)
+---
 
-### Installation
+## ✨ Key Features
 
-1. Clone this repository.
-2. Install dependencies by running:
+- **🏷️ Smart Ingredient Tag Input:** Quick-add chips with keyboard support (`Enter` / comma) and 1-tap hostel stash favorites.
+- **⚡ Multi-Equipment Filtering:** Gas stove, induction, microwave, air fryer, electric kettle, or no-heat raw modes.
+- **🚨 Hunger Urgency & Portion Scaling:**
+  - ⚡ *Quick Snack (< 5 min)*
+  - 🍛 *Hungry Student (10 min)*
+  - 🌙 *3 AM Emergency*
+  - 👤 *Single Serving vs 👥 Roommate Feast (2-3 People)*
+- **💡 Desi Jugaad Hacks & Substitutions:** Practical hostel lifehacks (e.g. using a steel glass bottom as a spatula, tiffin lid chopping boards, butter replacements).
+- **👨‍🍳 Interactive Step-by-Step "Cooking Mode":** Full-screen companion modal with tap-to-complete checklists, visual progress bars, and built-in kitchen countdown timers (`+1m`, `+2m`, `+5m`).
+- **🔊 Tactile Audio & Confetti:** Web Audio API sound effects (pops, delete clicks, timer alarms, victory fanfares) and HTML5 Canvas confetti celebrations.
+- **💨 Ambient Cooking Steam & Spatula Cursor:** GPU-accelerated rising cooking steam particles and a custom interactive Chef Spatula cursor with golden sizzle spark trails on click.
+- **🌓 Dual Mode Aesthetics:**
+  - **Warm Culinary Light Mode:** Soothing oatmilk cream (`#f6f1e7`) with terracotta accents.
+  - **Midnight Dark Mode:** Deep slate (`#0f1518`) with neon mint accents.
+- **📱 PWA & 100% Offline Survival Mode:** 1-click install on Android, iOS, and Desktop with offline fallback caching so you can cook even when hostel Wi-Fi dies.
+- **🤖 Zero-Fail Gemini AI Engine:** Automated Google AI Studio integration with dynamic model auto-discovery (`gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-pro`) and zero-fail local fallback generation.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend Framework:** React 19 + TypeScript + Vite
+- **Styling:** Vanilla Tailwind CSS + Custom Design Tokens (Zero TailwindCSS bloat)
+- **Icons:** Lucide React
+- **Audio Engine:** Native Web Audio API Synthesizer (Zero external mp3 files, 100% offline)
+- **Effects:** HTML5 Canvas Confetti & Ambient Rising Steam
+- **PWA:** Web App Manifest + Offline Service Worker
+- **AI Engine:** Google Gemini 1.5 Flash via Google AI Studio
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+### 1. Clone & Install Dependencies
+```bash
+git clone https://github.com/HR-894/Hackathon.git
+cd Hackathon
+pnpm install
+```
+
+### 2. Configure Environment Variables
+Create a `.env` file inside `artifacts/jugaad-bites/`:
+```bash
+cp artifacts/jugaad-bites/.env.example artifacts/jugaad-bites/.env 2>/dev/null || touch artifacts/jugaad-bites/.env
+```
+
+Add your free Google Gemini API key:
+```env
+VITE_GEMINI_API_KEY=your_google_gemini_api_key_here
+```
+> *(Get a free key in 30 seconds at [Google AI Studio](https://aistudio.google.com/app/apikey) — no credit card required).*
+
+### 3. Start the Dev Server
+From the project root:
+```bash
+pnpm run dev
+```
+Open **`http://localhost:5173`** in your browser.
+
+---
+
+## 🚢 Free Deployment on Vercel
+
+The project is pre-configured for free static Vercel deployment:
+
+1. **Push your code to GitHub:**
    ```bash
-   pnpm install
+   git add .
+   git commit -m "feat: complete JugaadBites app"
+   git push origin main
    ```
 
-### Running the Development Servers
+2. **Import into Vercel:**
+   - Go to [Vercel Dashboard](https://vercel.com/new).
+   - Select your `Hackathon` repository.
+   - The root [`vercel.json`](./vercel.json) automatically configures the build:
+     - **Build Command:** `pnpm --filter @workspace/jugaad-bites run build`
+     - **Install Command:** `pnpm install --no-frozen-lockfile`
+     - **Output Directory:** `public`
 
-You can run the entire stack in development mode using the standard commands in each package, or concurrently from the root.
+3. **Add Environment Variable on Vercel:**
+   - In Vercel Project Settings ➔ **Environment Variables**, add:
+     - **Key:** `VITE_GEMINI_API_KEY`
+     - **Value:** `your_gemini_api_key`
+   - Click **Deploy**! 🚀
 
-To run the frontend:
-```bash
-cd artifacts/jugaad-bites
-pnpm run dev
+---
+
+## 📂 Project Structure
+
 ```
-The frontend will start at `http://localhost:5173`.
-
-To run the backend API server:
-```bash
-cd artifacts/api-server
-pnpm run dev
-```
-The backend API server defaults to `http://localhost:5000` (or the port specified by the `PORT` environment variable).
-
-### Environment Variables
-
-**Frontend (`artifacts/jugaad-bites`)**:
-- Create a `.env` file or provide environment variables for API configuration if required. 
-- Example: `VITE_API_URL=http://localhost:5000`
-
-**Backend (`artifacts/api-server`)**:
-- `PORT`: Optional. Specifies the port the server listens on (defaults to `5000`).
-- `FRONTEND_URL`: Optional. Sets the allowed CORS origin for the frontend (defaults to `http://localhost:5173`).
-- `DATABASE_URL`: **Required**. A Postgres connection string for the database (e.g. `postgres://user:password@localhost:5432/jugaadbites`).
-
-*(Note: Ensure you have provisioned a local or remote PostgreSQL database and provided `DATABASE_URL` in your backend environment to avoid startup crashes.)*
-
-## Building for Production
-
-To typecheck and build all packages in the workspace:
-```bash
-pnpm run build
+.
+├── artifacts/
+│   └── jugaad-bites/          # Main Vite + React + TypeScript application
+│       ├── public/             # PWA manifest.json & sw.js
+│       ├── src/
+│       │   ├── components/     # SmokeEffect.tsx, KitchenCursor.tsx
+│       │   ├── lib/            # sound.ts (Web Audio), confetti.ts (Canvas)
+│       │   ├── App.tsx         # Main UI & AI Integration
+│       │   └── index.css       # Custom Theme Tokens & Animations
+│       └── vite.config.ts      # Builds directly to root /public for Vercel
+├── public/                     # Output directory served on Vercel
+├── vercel.json                 # Vercel deployment configuration
+└── README.md                   # Project Documentation
 ```
 
-This will invoke the respective `build` scripts inside each workspace project.
+---
+
+## 📄 License
+MIT License • Built with ❤️ for hackathons and hungry students everywhere.

@@ -222,11 +222,13 @@ const HUNGER_MODES = [
 ];
 
 const LOADING_MESSAGES = [
-  'Consulting the 3 AM hostel culinary gods...',
-  'Translating chef jargon (no "saute", no "simmer") into plain English...',
-  'Checking if this can be cooked with zero dirty dishes...',
-  'Calculating how to make random ingredients taste like a gourmet feast...',
-  'Filtering out impossible steps and fancy tools...',
+  '🍳 Firing up the culinary AI brain...',
+  '🔥 Converting random room stash into edible gold...',
+  '⚡ Finding the quickest, zero-panic cooking method...',
+  '🍜 Checking how to cook this with zero extra dirty dishes...',
+  '💡 Calculating optimal desi jugaad hacks & substitutions...',
+  '🥘 Filtering out impossible steps and fancy tools...',
+  '✨ Plating 2 idiot-proof survival recipes for you...',
 ];
 
 const SYSTEM_PROMPT = `You are a patient culinary AI for absolute beginners. Do not use culinary jargon (e.g., no 'saute' or 'simmer'). Only suggest 2 simple recipes using ONLY the provided ingredients and checked equipment. You MUST return a pure JSON array of objects with the exact keys: "recipeName" (string), "prepTime" (string), "equipmentNeeded" (array of strings), "missingIngredients" (array of strings), and "idiotProofSteps" (array of strings). Do NOT wrap the JSON in markdown blocks.`;
@@ -1012,7 +1014,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 {isLoading ? (
                   <>
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    <span>Cooking up foolproof instructions...</span>
+                    <span>Cooking up your survival recipes...</span>
                   </>
                 ) : (
                   <>
@@ -1051,8 +1053,8 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             <h3 className="mt-4 font-serif text-lg font-bold text-[#16202a] dark:text-[#f3eee4]">
               {LOADING_MESSAGES[loadingMsgIndex]}
             </h3>
-            <p className="mt-1 text-xs text-[#52636a] dark:text-[#8ca199] font-medium">
-              Hang tight! Your hunger is about to be solved.
+            <p className="mt-1.5 text-xs text-[#52636a] dark:text-[#8ca199] font-semibold">
+              ✨ Zero panic • Your meal is only a few minutes away!
             </p>
           </div>
         )}

@@ -43,6 +43,9 @@ self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('generativelanguage.googleapis.com')) {
     return;
   }
+  if (event.request.url.includes('api.groq.com')) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

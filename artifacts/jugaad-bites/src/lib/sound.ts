@@ -48,6 +48,7 @@ class SoundManager {
 
       osc.connect(gain);
       gain.connect(ctx.destination);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 
       osc.start();
       osc.stop(ctx.currentTime + 0.08);
@@ -75,6 +76,7 @@ class SoundManager {
 
       osc.connect(gain);
       gain.connect(ctx.destination);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 
       osc.start();
       osc.stop(ctx.currentTime + 0.06);
@@ -101,6 +103,7 @@ class SoundManager {
 
         osc.connect(gain);
         gain.connect(ctx.destination);
+        osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 
         osc.start(ctx.currentTime + idx * 0.08);
         osc.stop(ctx.currentTime + idx * 0.08 + 0.35);
@@ -127,6 +130,7 @@ class SoundManager {
 
       osc.connect(gain);
       gain.connect(ctx.destination);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 
       osc.start();
       osc.stop(ctx.currentTime + 0.12);
@@ -152,6 +156,7 @@ class SoundManager {
 
         osc.connect(gain);
         gain.connect(ctx.destination);
+        osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 
         osc.start(ctx.currentTime + i * 0.2);
         osc.stop(ctx.currentTime + i * 0.2 + 0.18);
@@ -186,6 +191,7 @@ class SoundManager {
 
         osc.connect(gain);
         gain.connect(ctx.destination);
+        osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 
         osc.start(t);
         osc.stop(t + d);

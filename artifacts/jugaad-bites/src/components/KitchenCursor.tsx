@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // ==========================================
 // Custom Interactive Kitchen Tool Cursor
@@ -93,15 +93,21 @@ export function KitchenCursor() {
       window.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [isVisible]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Particle updates
+  // Particle physics updates via ref to avoid interval thrashing on rapid clicks
+  const hasSparks = useRef(false);
+  useEffect(() => {
+    hasSparks.current = sparks.length > 0;
+  }, [sparks.length]);
+
   useEffect(() => {
     if (sparks.length === 0) return;
 
     const interval = setInterval(() => {
-      setSparks((prev) =>
-        prev
+      setSparks((prev) => {
+        const next = prev
           .map((s) => ({
             ...s,
             x: s.x + s.vx,
@@ -109,12 +115,15 @@ export function KitchenCursor() {
             vy: s.vy + 0.25,
             alpha: s.alpha - 0.06,
           }))
-          .filter((s) => s.alpha > 0)
-      );
+          .filter((s) => s.alpha > 0);
+        return next;
+      });
     }, 16);
 
     return () => clearInterval(interval);
-  }, [sparks.length]);
+  // Only start/stop the interval, don't restart on every length change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sparks.length > 0]);
 
   if (!isVisible) return null;
 

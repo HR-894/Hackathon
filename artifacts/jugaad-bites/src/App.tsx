@@ -72,6 +72,8 @@ interface BeforeInstallPromptEvent extends Event {
 
 // ==========================================
 // Ultra-Fast Groq AI Client (Default Primary Engine: ~0.3s Latency)
+// ⚠️ SECURITY NOTE: VITE_ env vars are inlined into the JS bundle at build time.
+// For production, move API calls behind a server-side proxy (e.g. /api/recipes).
 // ==========================================
 export class GroqClient {
   private apiKey: string;
@@ -103,7 +105,7 @@ export class GroqClient {
               { role: 'system', content: systemInstruction + '\nReturn JSON.' },
               { role: 'user', content: prompt },
             ],
-            temperature: 0.2,
+            temperature: 0.7,
             max_tokens: 900,
             response_format: { type: 'json_object' },
           }),
@@ -160,7 +162,7 @@ export class GoogleGenerativeAI {
                 },
               ],
               generationConfig: {
-                temperature: 0.25,
+                temperature: 0.7,
                 maxOutputTokens: 900,
                 response_mime_type: 'application/json',
               },
@@ -251,45 +253,157 @@ const LOADING_MESSAGES = [
   '✨ Plating 2 idiot-proof survival recipes for you...',
 ];
 
-const SYSTEM_PROMPT = `You are a patient culinary AI for absolute beginners. Do not use culinary jargon (e.g., no 'saute' or 'simmer'). Only suggest 2 simple recipes using ONLY the provided ingredients and checked equipment. You MUST return a pure JSON array of objects with the exact keys: "recipeName" (string), "prepTime" (string), "equipmentNeeded" (array of strings), "missingIngredients" (array of strings), and "idiotProofSteps" (array of strings). Do NOT wrap the JSON in markdown blocks.`;
+const SYSTEM_PROMPT = `You are a patient culinary AI for absolute beginners.
+Rules:
+- NEVER use culinary jargon (e.g., no 'saute', 'simmer', 'blanch', 'fold', 'emulsify'). Use plain, clear English.
+- Generate 2 DISTINCTLY DIFFERENT recipes (e.g. Recipe 1: crispy dry snack/roll/melt, Recipe 2: warm comfort bowl/scramble/toss).
+- Use ONLY the provided ingredients and checked equipment.
+- You MUST return a valid JSON object with this exact structure:
+{
+  "recipes": [
+    {
+      "recipeName": "Crispy Dish Name",
+      "prepTime": "X minutes",
+      "equipmentNeeded": ["Gas Stove"],
+      "missingIngredients": ["Optional seasoning"],
+      "idiotProofSteps": ["Step 1...", "Step 2..."],
+      "jugaadHack": "Handy kitchen lifehack...",
+      "substitutions": ["Alternative ingredient..."]
+    }
+  ]
+}`;
 
 function generateDynamicFallback(ingredients: string[], equipment: string[]): Recipe[] {
-  const main1 = ingredients[0] || 'Snack';
-  const main2 = ingredients[1] || ingredients[0] || 'Quick Bite';
+  const clean = ingredients.map((i) => i.trim()).filter(Boolean);
+  const m1 = clean[0] || 'Snack';
+  const m2 = clean[1] || clean[0] || 'Goodies';
+  const m3 = clean[2] || clean[0] || 'Spices';
   const eq = equipment.length > 0 ? equipment : ['Gas Stove', 'Induction Cooktop'];
+  const primaryEq = eq[0] || 'Gas Stove';
+  const secondaryEq = eq[1] || eq[0] || 'Induction Cooktop';
 
-  return [
+  // Rich Archetype Library
+  const archetypes = [
     {
-      recipeName: `Crispy ${main1} Pan-Toastie`,
-      prepTime: '6 minutes',
-      equipmentNeeded: [eq[0] || 'Gas Stove'],
-      missingIngredients: [],
-      idiotProofSteps: [
-        `Place your cooking pan on medium-low flame. (Keep the heat low so ${main1.toLowerCase()} browns without burning).`,
-        `Grease the pan lightly with butter, ghee, or cooking oil.`,
-        `Add your ${main1} into the pan. If using bread or veggies, press gently with a flat spoon for 2 minutes.`,
-        `Flip carefully when the bottom turns golden brown.`,
-        `Cook the second side for another 1-2 minutes until warm, crispy, and delicious.`,
-      ],
-      jugaadHack: 'No spatula? Use the flat bottom of a steel glass to press and flip.',
-      substitutions: ['No butter? 1 tsp cooking oil, ghee, or milk malai works wonders.'],
+      id: 'tawa_melt',
+      create: (): Recipe => ({
+        recipeName: `Golden ${m1} & ${m2} Tawa Crisp`,
+        prepTime: '6 minutes',
+        equipmentNeeded: [primaryEq],
+        missingIngredients: ['Chili flakes / oregano (optional)'],
+        idiotProofSteps: [
+          `Place your pan or tawa on medium-low flame. (Keep heat gentle so your ${m1.toLowerCase()} browns without burning).`,
+          `Grease the pan with 1/2 tsp butter, cooking oil, or ghee.`,
+          `Add ${m1} (and layer in ${m2} if you like). Press down gently with a flat spoon for 2 minutes.`,
+          `Carefully flip once the bottom turns golden brown and crispy.`,
+          `Cook the other side for another 1-2 minutes until hot and delicious.`,
+        ],
+        jugaadHack: 'No spatula? Use the flat bottom of a steel cup or glass to press down and flip.',
+        substitutions: ['No butter? 1 tsp cooking oil, ghee, or milk malai works equally well.'],
+      }),
     },
     {
-      recipeName: `Comfort ${main2} Quick-Bowl`,
-      prepTime: '8 minutes',
-      equipmentNeeded: [eq[1] || eq[0] || 'Electric Kettle'],
-      missingIngredients: ['Salt / Pepper to taste'],
-      idiotProofSteps: [
-        `Bring 1.5 cups of water to a gentle boil in your kettle or pan.`,
-        `Add your ${main2} and any seasonings you have.`,
-        `Let it cook for 3 to 4 minutes without stirring aggressively.`,
-        `Turn off the heat and let it rest for 60 seconds so flavors settle.`,
-        `Pour into a bowl (or eat straight from the tiffin) and enjoy warm!`,
-      ],
-      jugaadHack: 'No bowl? Eat straight from a steel container to save dishwashing.',
-      substitutions: ['Add crushed peanuts or ketchup for instant flavor elevation.'],
+      id: 'pan_scramble',
+      create: (): Recipe => ({
+        recipeName: `3-Min Desi ${m1} Masala Toss`,
+        prepTime: '5 minutes',
+        equipmentNeeded: [primaryEq],
+        missingIngredients: ['Salt / Pepper to taste'],
+        idiotProofSteps: [
+          `Heat 1 tsp oil or butter in your pan on medium heat.`,
+          `Tear or chop ${m1} and ${m2} into rough bite-sized pieces and drop them into the pan.`,
+          `Stir continuously for 3 minutes until fragrant and lightly browned.`,
+          `If you have ${m3}, toss it in during the last 30 seconds for extra flavor.`,
+          `Turn off heat, transfer to a plate, and dig in while hot!`,
+        ],
+        jugaadHack: 'No chopping board? Cut veggies against the inside of a tiffin lid or tear by hand.',
+        substitutions: ['Sprinkle a pinch of Maggi masala or chat masala for instant street-food taste.'],
+      }),
+    },
+    {
+      id: 'kettle_stew',
+      create: (): Recipe => ({
+        recipeName: `Comfort ${m1} & ${m2} Broth Bowl`,
+        prepTime: '8 minutes',
+        equipmentNeeded: [eq.includes('Electric Kettle') ? 'Electric Kettle' : secondaryEq],
+        missingIngredients: ['Black pepper or sauce to taste'],
+        idiotProofSteps: [
+          `Bring 1.5 cups of water to a gentle boil in your kettle or pan.`,
+          `Drop in your ${m1} and let it soften for 2 to 3 minutes.`,
+          `Add ${m2} and any seasonings or sauce sachets you have.`,
+          `Let it simmer for another 2 minutes without stirring too hard.`,
+          `Pour everything into a bowl (or eat straight from the tiffin) and enjoy warm!`,
+        ],
+        jugaadHack: 'No bowl? Eat straight from a steel container or mug to avoid dishwashing.',
+        substitutions: ['Add ketchup or crushed peanuts for an instant gourmet upgrade.'],
+      }),
+    },
+    {
+      id: 'pan_roll',
+      create: (): Recipe => ({
+        recipeName: `Crispy ${m1} Stash Frankie Roll`,
+        prepTime: '7 minutes',
+        equipmentNeeded: [primaryEq],
+        missingIngredients: ['Tomato ketchup / spicy sauce'],
+        idiotProofSteps: [
+          `Warm your pan on medium flame with a few drops of oil or butter.`,
+          `Toast your ${m1} on both sides until soft and pliable (or crispy if you prefer).`,
+          `Layer your ${m2} and ${m3} right down the center.`,
+          `Roll it up tightly into a wrap or cylinder shape.`,
+          `Place the seam side down on the hot pan for 60 seconds to seal the crunch.`,
+        ],
+        jugaadHack: 'Wrap the bottom in a clean tissue paper or foil to eat without greasy hands.',
+        substitutions: ['No sauce? A dash of curd or mayonnaise makes it super juicy.'],
+      }),
+    },
+    {
+      id: 'microwave_zap',
+      create: (): Recipe => ({
+        recipeName: `Speedy ${m1} & ${m2} Meltdown`,
+        prepTime: '4 minutes',
+        equipmentNeeded: [eq.includes('Microwave') ? 'Microwave' : primaryEq],
+        missingIngredients: ['Chili flakes / ketchup'],
+        idiotProofSteps: [
+          `In a microwave-safe bowl or mug (or warm pan), add your ${m1}.`,
+          `Top with ${m2} and a pinch of seasonings.`,
+          `Zap in the microwave for 60 to 90 seconds (or cook covered on low flame for 3 mins).`,
+          `Check that everything is warm, melted, and bubbling.`,
+          `Let it cool for 30 seconds and enjoy!`,
+        ],
+        jugaadHack: 'Cover the bowl with a ceramic plate in the microwave to trap steam and melt faster.',
+        substitutions: ['Top with crushed potato chips or bhujia for extra crunch.'],
+      }),
+    },
+    {
+      id: 'hash_bites',
+      create: (): Recipe => ({
+        recipeName: `Sizzling ${m1} Pan-Seared Hash`,
+        prepTime: '6 minutes',
+        equipmentNeeded: [primaryEq],
+        missingIngredients: ['Salt / Chaat masala'],
+        idiotProofSteps: [
+          `Mash or roughly dice ${m1} with a spoon.`,
+          `Mix in ${m2} with a pinch of salt to form rustic mini cakes or patties.`,
+          `Place onto a hot, greased pan on medium heat.`,
+          `Leave undisturbed for 3 minutes so a solid golden crust forms.`,
+          `Flip and brown the reverse side for 2 minutes.`,
+        ],
+        jugaadHack: 'Don\'t flip too early—letting the crust form first prevents sticking to the pan.',
+        substitutions: ['Add a dash of lemon juice or ketchup right before serving.'],
+      }),
     },
   ];
+
+  // Fisher-Yates shuffle for unbiased randomization
+  const shuffled = [...archetypes];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  const r1 = shuffled[0].create();
+  const r2 = shuffled[1].create();
+
+  return [r1, r2];
 }
 
 // ==========================================
@@ -444,7 +558,8 @@ export default function App() {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isTimerRunning, timerSeconds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTimerRunning]);
 
   // Tag Management
   const addIngredient = (name: string) => {
@@ -544,13 +659,24 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
       let parsed: Recipe[] | null = null;
       try {
         const data = JSON.parse(cleanJson);
-        if (Array.isArray(data)) parsed = data;
-        else if (data && Array.isArray(data.recipes)) parsed = data.recipes;
+        if (Array.isArray(data)) {
+          parsed = data;
+        } else if (data && Array.isArray(data.recipes)) {
+          parsed = data.recipes;
+        } else if (data && Array.isArray(data.data)) {
+          parsed = data.data;
+        } else if (data && typeof data === 'object') {
+          // If returned single recipe object, wrap in array
+          if (data.recipeName && data.idiotProofSteps) {
+            parsed = [data as Recipe];
+          }
+        }
       } catch {
-        const match = cleanJson.match(/\[\s*\{[\s\S]*\}\s*\]/);
-        if (match) {
+        // Fallback: extract array or recipes object with regex
+        const arrayMatch = cleanJson.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (arrayMatch) {
           try {
-            parsed = JSON.parse(match[0]);
+            parsed = JSON.parse(arrayMatch[0]);
           } catch {
             parsed = null;
           }
@@ -585,7 +711,6 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
           if (enriched) {
             setRecipes(enriched);
             sounds.playSuccess();
-            setIsLoading(false);
             setTimeout(() => {
               resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 120);
@@ -612,7 +737,6 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
           if (enriched) {
             setRecipes(enriched);
             sounds.playSuccess();
-            setIsLoading(false);
             setTimeout(() => {
               resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 120);
@@ -646,7 +770,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 
 💡 Desi Jugaad: ${recipe.jugaadHack || 'Zero panic cooking.'}`;
 
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text).catch(() => {});
     setCopiedIndex(index);
     sounds.playCheck();
     setTimeout(() => setCopiedIndex(null), 2000);

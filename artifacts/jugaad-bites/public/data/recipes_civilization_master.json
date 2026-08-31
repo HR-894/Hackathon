@@ -1,0 +1,74 @@
+[
+  {
+    "id": "db_chunk_kettle_maggi",
+    "recipeName": "Hostel Kettle Cheese & Butter Maggi",
+    "prepTime": "4 minutes",
+    "category": "midnight_snack",
+    "equipmentNeeded": ["Electric Kettle", "Gas Stove"],
+    "keyIngredients": ["Instant Noodles", "Cheese", "Butter"],
+    "missingIngredients": ["Oregano / Chili flakes"],
+    "idiotProofSteps": [
+      "Boil 1.5 cups water in your electric kettle.",
+      "Add noodle cake and spice tastemaker sachet.",
+      "Let boil for 3 minutes until water reduces to a rich sauce glaze.",
+      "Drop in 1 tsp butter and top with cheese slice.",
+      "Cover kettle for 60 seconds to melt into a creamy noodle bowl!"
+    ],
+    "jugaadHack": "Eat straight from the kettle with a fork to leave zero dirty dishes.",
+    "substitutions": ["No cheese? A spoon of milk malai or mayo creates the same creamy texture."]
+  },
+  {
+    "id": "db_chunk_bread_omelette",
+    "recipeName": "5-Min Street-Style Bread Omelette",
+    "prepTime": "5 minutes",
+    "category": "breakfast",
+    "equipmentNeeded": ["Gas Stove", "Induction Cooktop"],
+    "keyIngredients": ["Eggs", "Bread", "Butter", "Onion"],
+    "missingIngredients": ["Green chillies / Salt / Pepper"],
+    "idiotProofSteps": [
+      "Crack 2 eggs in a mug with finely chopped onions, pinch of salt and pepper.",
+      "Melt 1/2 tsp butter in a hot pan; pour egg mix.",
+      "Immediately place 2 slices of bread right on top of the raw egg layer.",
+      "Flip after 90 seconds so the bread crisps up while egg cooks fully.",
+      "Fold the sides over the bread, toast for 30 seconds, and serve hot!"
+    ],
+    "jugaadHack": "Beat eggs with a fork in a coffee mug for 30 seconds for extra fluffy omelettes.",
+    "substitutions": ["No butter? Cooking oil or ghee works equally well."]
+  },
+  {
+    "id": "db_chunk_mug_pizza",
+    "recipeName": "2-Minute Microwave Mug Pizza",
+    "prepTime": "3 minutes",
+    "category": "midnight_snack",
+    "equipmentNeeded": ["Microwave"],
+    "keyIngredients": ["Bread", "Cheese", "Ketchup", "Butter"],
+    "missingIngredients": ["Chili flakes / Oregano"],
+    "idiotProofSteps": [
+      "Tear 1 slice of bread into small pieces and press into the bottom of a coffee mug.",
+      "Spread 1 tsp ketchup over the bread base.",
+      "Layer with grated or sliced cheese and any diced onions or tomatoes.",
+      "Microwave on high for 60 to 75 seconds until cheese is melted and bubbling.",
+      "Sprinkle oregano or chili flakes and eat straight from the mug!"
+    ],
+    "jugaadHack": "Keep leftover pizza seasoning sachets in your study drawer for instant gourmet toppings.",
+    "substitutions": ["Use roti or biscuit crumbs if you are completely out of bread."]
+  },
+  {
+    "id": "db_chunk_spicy_waiwai_chaat",
+    "recipeName": "3-Min Zero-Cook Spicy Noodle Chaat",
+    "prepTime": "3 minutes",
+    "category": "midnight_snack",
+    "equipmentNeeded": ["No Heat / Toaster"],
+    "keyIngredients": ["Instant Noodles", "Onion", "Tomato", "Peanuts"],
+    "missingIngredients": ["Lemon juice / Chaat masala"],
+    "idiotProofSteps": [
+      "Crush raw noodle cake inside the packet into small bite-sized pieces.",
+      "Transfer to a bowl or tiffin container.",
+      "Add the tastemaker spice sachet, chopped onion, tomato, and crunchy peanuts.",
+      "Squeeze 1/2 fresh lemon and shake sealed container vigorously for 10 seconds.",
+      "Eat immediately for an iconic, crunchy hostel midnight bite!"
+    ],
+    "jugaadHack": "Shake directly in the noodle packet or tiffin for zero dishwashing.",
+    "substitutions": ["Add bhujia or sev for extra street-style crunch."]
+  }
+]

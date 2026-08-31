@@ -54,6 +54,7 @@ import { SmokeEffect } from '@/components/SmokeEffect';
 import { KitchenCursor } from '@/components/KitchenCursor';
 import { validateIngredients, validateIngredientsWithAI, type ValidationResult } from '@/lib/safetyGuard';
 import { searchRecipeDatabase, type DatabaseRecipe } from '@/lib/recipeDatabase';
+import { searchUnlimitedLocalDB } from '@/lib/indexedDbStore';
 import { VoiceChefAssistant, type VoiceCommand } from '@/lib/voiceAssistant';
 import { QuickDeliveryModal } from '@/components/QuickDeliveryModal';
 import { PhotoScannerModal } from '@/components/PhotoScannerModal';
@@ -791,8 +792,8 @@ export default function App() {
     }
     setInedibleAlert(null);
 
-    // 2. Fetch Top Matches from Human Civilization Database
-    const dbRawMatches = searchRecipeDatabase(ingredients, selectedEquipment, 4);
+    // 2. Fetch Top Matches from Unlimited Client-Side IndexedDB Engine
+    const dbRawMatches = await searchUnlimitedLocalDB(ingredients, selectedEquipment, 4);
     const dbRecipes: Recipe[] = dbRawMatches.map((d) => ({
       recipeName: d.recipeName,
       prepTime: d.prepTime,

@@ -39,11 +39,25 @@ import {
   CheckCheck,
   Sun,
   Moon,
+  Camera,
+  ShoppingBag,
+  Mic,
+  MicOff,
+  User as UserIcon,
+  ShieldAlert,
+  Database,
+  Bookmark,
 } from 'lucide-react';
 import { sounds } from '@/lib/sound';
 import { fireConfetti } from '@/lib/confetti';
 import { SmokeEffect } from '@/components/SmokeEffect';
 import { KitchenCursor } from '@/components/KitchenCursor';
+import { validateIngredients, validateIngredientsWithAI, type ValidationResult } from '@/lib/safetyGuard';
+import { searchRecipeDatabase, type DatabaseRecipe } from '@/lib/recipeDatabase';
+import { VoiceChefAssistant, type VoiceCommand } from '@/lib/voiceAssistant';
+import { QuickDeliveryModal } from '@/components/QuickDeliveryModal';
+import { PhotoScannerModal } from '@/components/PhotoScannerModal';
+import { AuthModal, type UserProfile } from '@/components/AuthModal';
 
 // ==========================================
 // Types & Interfaces
@@ -56,6 +70,7 @@ export interface Recipe {
   idiotProofSteps: string[];
   jugaadHack?: string;
   substitutions?: string[];
+  sourceBadge?: 'ai' | 'database';
 }
 
 interface EquipmentOption {
@@ -254,7 +269,17 @@ const LOADING_MESSAGES = [
 ];
 
 const SYSTEM_PROMPT = `You are a patient culinary AI for absolute beginners.
-Rules:
+CRITICAL SAFETY & EDIBILITY RULES:
+- You are STRICTLY a human food cooking assistant.
+- If ANY ingredient provided is NOT a real edible food (e.g. household items like 'fan', 'tv', 'chair', 'pillow', 'clothes', 'plastic', 'wood', 'metal', 'electronics', 'chemicals', 'poison', 'human parts', 'stones'), YOU MUST REFUSE TO COOK IT.
+- If an inedible item is detected, return ONLY a valid JSON object in this format:
+{
+  "error": "Inedible item detected",
+  "inedibleItems": ["fan"]
+}
+- NEVER create joke, metaphorical, or surreal recipes with non-food objects.
+
+Standard Recipe Generation Rules:
 - NEVER use culinary jargon (e.g., no 'saute', 'simmer', 'blanch', 'fold', 'emulsify'). Use plain, clear English.
 - Generate 2 DISTINCTLY DIFFERENT recipes (e.g. Recipe 1: crispy dry snack/roll/melt, Recipe 2: warm comfort bowl/scramble/toss).
 - Use ONLY the provided ingredients and checked equipment.
@@ -420,6 +445,54 @@ export default function App() {
     return 'light';
   });
 
+  // State: User Profile & Pro Tier
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('jugaad_user_profile');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {}
+      }
+    }
+    return {
+      name: 'Guest Cook',
+      email: '',
+      avatar: '',
+      isLoggedIn: false,
+      isPro: true, // Default to Pro AI mode for high-capacity merge
+      aiCreditsRemaining: 5,
+    };
+  });
+
+  // State: Tier Mode (Pro AI + DB Merge vs Free Fast DB)
+  const [tierMode, setTierMode] = useState<'pro' | 'free'>('pro');
+
+  // State: Inedible Safety Guard Alert
+  const [inedibleAlert, setInedibleAlert] = useState<ValidationResult | null>(null);
+
+  // State: 10-Min Quick Delivery Modal
+  const [deliveryModal, setDeliveryModal] = useState<{
+    isOpen: boolean;
+    recipeName: string;
+    missingItems: string[];
+  }>({
+    isOpen: false,
+    recipeName: '',
+    missingItems: [],
+  });
+
+  // State: Photo Stash Scanner Modal
+  const [isPhotoScannerOpen, setIsPhotoScannerOpen] = useState<boolean>(false);
+
+  // State: Auth Modal
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
+  // State: Hands-Free Voice Assistant
+  const [isVoiceChefActive, setIsVoiceChefActive] = useState<boolean>(false);
+  const [voiceTranscript, setVoiceTranscript] = useState<string>('');
+  const voiceChefRef = useRef<VoiceChefAssistant | null>(null);
+
   // State: Ingredients Tag Input
   const [ingredients, setIngredients] = useState<string[]>(['Bread', 'Butter', 'Cheese']);
   const [inputVal, setInputVal] = useState<string>('');
@@ -480,6 +553,70 @@ export default function App() {
     sounds.playPop();
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
+
+  // Voice Assistant Handler in Cooking Mode
+  useEffect(() => {
+    if (!activeCookingRecipe) {
+      if (voiceChefRef.current) {
+        voiceChefRef.current.stop();
+        setIsVoiceChefActive(false);
+      }
+      return;
+    }
+
+    voiceChefRef.current = new VoiceChefAssistant({
+      onCommand: (cmd: VoiceCommand) => {
+        if (cmd.type === 'NEXT_STEP') {
+          setCompletedSteps((prev) => {
+            if (!activeCookingRecipe) return prev;
+            const nextIdx = prev.length;
+            if (nextIdx < activeCookingRecipe.idiotProofSteps.length) {
+              const updated = [...prev, nextIdx];
+              sounds.playCheck();
+              const nextStepText = activeCookingRecipe.idiotProofSteps[nextIdx];
+              voiceChefRef.current?.speak(`Step ${nextIdx + 1}: ${nextStepText}`);
+              if (updated.length === activeCookingRecipe.idiotProofSteps.length) {
+                sounds.playCelebration();
+                fireConfetti(3000);
+              }
+              return updated;
+            }
+            return prev;
+          });
+        } else if (cmd.type === 'PREV_STEP') {
+          setCompletedSteps((prev) => {
+            if (prev.length > 0) {
+              sounds.playDelete();
+              return prev.slice(0, prev.length - 1);
+            }
+            return prev;
+          });
+        } else if (cmd.type === 'REPEAT_STEP') {
+          if (activeCookingRecipe) {
+            const currentIdx = completedSteps.length;
+            const stepText =
+              activeCookingRecipe.idiotProofSteps[currentIdx] ||
+              activeCookingRecipe.idiotProofSteps[activeCookingRecipe.idiotProofSteps.length - 1];
+            voiceChefRef.current?.speak(`Step ${currentIdx + 1}: ${stepText}`);
+          }
+        } else if (cmd.type === 'SET_TIMER') {
+          startTimer(cmd.minutes * 60);
+        } else if (cmd.type === 'STOP') {
+          setIsVoiceChefActive(false);
+        }
+      },
+      onListeningChange: (listening) => {
+        setIsVoiceChefActive(listening);
+      },
+      onSpeechRecognized: (text) => {
+        setVoiceTranscript(text);
+      },
+    });
+
+    return () => {
+      voiceChefRef.current?.stop();
+    };
+  }, [activeCookingRecipe, completedSteps.length]);
 
   // Scroll Listener
   useEffect(() => {
@@ -563,7 +700,7 @@ export default function App() {
 
   // Tag Management
   const addIngredient = (name: string) => {
-    const cleanName = name.trim();
+    const cleanName = name.replace(/[\r\n\t]+/g, ' ').trim().slice(0, 60);
     if (!cleanName) return;
     const exists = ingredients.some((item) => item.toLowerCase() === cleanName.toLowerCase());
     if (!exists) {
@@ -571,11 +708,13 @@ export default function App() {
       sounds.playPop();
     }
     setInputVal('');
+    setInedibleAlert(null);
   };
 
   const removeIngredient = (indexToRemove: number) => {
     sounds.playDelete();
     setIngredients((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    setInedibleAlert(null);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -619,7 +758,7 @@ export default function App() {
     e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
   };
 
-  // Fetch Logic
+  // Fetch Logic (High-Security Safety Guard + Database & AI Merge)
   const fetchRecipes = async () => {
     if (ingredients.length === 0) {
       inputRef.current?.focus();
@@ -641,6 +780,42 @@ export default function App() {
       (import.meta as unknown as { env: Record<string, string> }).env?.VITE_GEMINI_API_KEY ||
       '';
 
+    // 1. HIGH PRIORITY: Dual-Layer (Local + AI) Inedible & Non-Food Guardrail
+    const safetyCheck = await validateIngredientsWithAI(ingredients, groqKey, geminiKey);
+    if (!safetyCheck.isValid) {
+      setInedibleAlert(safetyCheck);
+      sounds.playDelete();
+      setIsLoading(false);
+      window.scrollTo({ top: 350, behavior: 'smooth' });
+      return;
+    }
+    setInedibleAlert(null);
+
+    // 2. Fetch Top Matches from Human Civilization Database
+    const dbRawMatches = searchRecipeDatabase(ingredients, selectedEquipment, 4);
+    const dbRecipes: Recipe[] = dbRawMatches.map((d) => ({
+      recipeName: d.recipeName,
+      prepTime: d.prepTime,
+      equipmentNeeded: d.equipmentNeeded,
+      missingIngredients: d.missingIngredients,
+      idiotProofSteps: d.idiotProofSteps,
+      jugaadHack: d.jugaadHack,
+      substitutions: d.substitutions,
+      sourceBadge: 'database',
+    }));
+
+    // 3. Normal / Free Tier: Deliver Instant Civilization Database Recipes (3-4 recipes)
+    if (tierMode === 'free' || (!groqKey && !geminiKey) || isOffline) {
+      setRecipes(dbRecipes.slice(0, 3));
+      sounds.playSuccess();
+      setIsLoading(false);
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 120);
+      return;
+    }
+
+    // 4. Pro AI Tier: Blend Human Civilization Database (Top 2) + Live AI Generation (2-3) = 4-5 total!
     const userPrompt = `Available Ingredients: ${ingredients.join(', ')}
 Available Equipment: ${selectedEquipment.join(', ')}
 Target Portions: ${portionMultiplier === 1 ? 'Single serving (1 person)' : '2-3 people'}
@@ -659,6 +834,19 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
       let parsed: Recipe[] | null = null;
       try {
         const data = JSON.parse(cleanJson);
+        // Catch AI Safety refusal on inedible items
+        if (data && (data.error || data.inedibleItems)) {
+          const badItems = Array.isArray(data.inedibleItems) && data.inedibleItems.length > 0 ? data.inedibleItems : ['Inedible Object'];
+          setInedibleAlert({
+            isValid: false,
+            invalidItems: badItems,
+            message: `Inedible item detected: "${badItems.join(', ')}". Our culinary AI only cooks real edible food!`,
+            humorousQuote: '🚫 Safety alert! We cannot cook household items or non-food objects.',
+          });
+          sounds.playDelete();
+          return null;
+        }
+
         if (Array.isArray(data)) {
           parsed = data;
         } else if (data && Array.isArray(data.recipes)) {
@@ -666,13 +854,11 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
         } else if (data && Array.isArray(data.data)) {
           parsed = data.data;
         } else if (data && typeof data === 'object') {
-          // If returned single recipe object, wrap in array
           if (data.recipeName && data.idiotProofSteps) {
             parsed = [data as Recipe];
           }
         }
       } catch {
-        // Fallback: extract array or recipes object with regex
         const arrayMatch = cleanJson.match(/\[\s*\{[\s\S]*\}\s*\]/);
         if (arrayMatch) {
           try {
@@ -686,6 +872,7 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed.map((rec, i) => ({
           ...rec,
+          sourceBadge: 'ai' as const,
           jugaadHack:
             rec.jugaadHack ||
             (i === 0
@@ -709,7 +896,9 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
           const enriched = parseAndEnrichJson(rawText);
 
           if (enriched) {
-            setRecipes(enriched);
+            // MERGE: Top 2 from Database + 2 from Live AI = 4 diverse recipes!
+            const mergedResults = [...enriched, ...dbRecipes.slice(0, 2)];
+            setRecipes(mergedResults);
             sounds.playSuccess();
             setTimeout(() => {
               resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -735,7 +924,8 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
           const enriched = parseAndEnrichJson(rawText);
 
           if (enriched) {
-            setRecipes(enriched);
+            const mergedResults = [...enriched, ...dbRecipes.slice(0, 2)];
+            setRecipes(mergedResults);
             sounds.playSuccess();
             setTimeout(() => {
               resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -744,13 +934,13 @@ Please provide 2 beginner-friendly, foolproof recipes with zero confusing terms.
           }
         } catch (apiErr) {
           console.warn('Gemini API fallback triggered:', apiErr);
-          setStatusNote('Serving curated survival recipes (auto-fallback mode).');
+          setStatusNote('Serving curated civilization recipes (auto-fallback mode).');
         }
       }
 
-      // 3. Zero-Fail Local Dynamic Survival Engine (Instant Offline ready)
+      // 3. Zero-Fail Local Dynamic Fallback + Database Merge
       const dynamicFallback = generateDynamicFallback(ingredients, selectedEquipment);
-      setRecipes(dynamicFallback);
+      setRecipes([...dynamicFallback, ...dbRecipes.slice(0, 2)]);
       sounds.playSuccess();
 
       setTimeout(() => {
@@ -872,8 +1062,70 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons & Tier Switcher */}
           <div className="flex items-center gap-2">
+            {/* Pro AI vs Free Database Tier Toggle */}
+            <div className="hidden sm:flex items-center rounded-xl border border-[#ded4c1] dark:border-[#2a3c45] bg-[#fffdf9] dark:bg-[#192429] p-1 text-xs font-bold shadow-2xs">
+              <button
+                onClick={() => {
+                  sounds.playPop();
+                  setTierMode('pro');
+                }}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 transition ${
+                  tierMode === 'pro'
+                    ? 'bg-[#e65e3d] text-white shadow-xs'
+                    : 'text-[#52636a] dark:text-[#8ea299] hover:text-[#16202a]'
+                }`}
+                title="Blend Human Civilization Database + Live AI generation"
+              >
+                <Sparkles size={12} className={tierMode === 'pro' ? 'text-[#f4c453]' : ''} />
+                <span>✨ AI + DB Merge</span>
+              </button>
+              <button
+                onClick={() => {
+                  sounds.playPop();
+                  setTierMode('free');
+                }}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 transition ${
+                  tierMode === 'free'
+                    ? 'bg-[#166e64] text-white shadow-xs'
+                    : 'text-[#52636a] dark:text-[#8ea299] hover:text-[#16202a]'
+                }`}
+                title="Instant zero-latency Human Civilization Database recipes"
+              >
+                <Database size={12} />
+                <span>⚡ Free DB</span>
+              </button>
+            </div>
+
+            {/* Google Profile / Sign-in Button */}
+            <button
+              onClick={() => {
+                sounds.playPop();
+                setIsAuthModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 rounded-xl border border-[#ded4c1] dark:border-[#2a3c45] bg-[#fffdf9] dark:bg-[#192429] px-2.5 py-1.5 text-xs font-bold text-[#16202a] dark:text-[#f3eee4] shadow-xs hover:border-[#166e64] transition active:scale-95"
+            >
+              {userProfile.isLoggedIn ? (
+                <>
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#166e64] text-[10px] text-white font-bold">
+                    {userProfile.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="hidden md:inline line-clamp-1 max-w-[80px]">{userProfile.name}</span>
+                  {userProfile.isPro && (
+                    <span className="rounded-full bg-[#f4c453] px-1.5 py-0.2 text-[0.6rem] font-extrabold text-[#16202a]">
+                      PRO
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <UserIcon size={14} className="text-[#e65e3d]" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </>
+              )}
+            </button>
+
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
@@ -926,7 +1178,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
         <div className="mx-auto max-w-3xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#bfe2d4] dark:border-[#2d3f47] bg-[#e6f4ee] dark:bg-[#162126] px-3.5 py-1 text-xs font-bold text-[#115e54] dark:text-[#38c9bc] shadow-xs">
             <Sparkles size={14} className="text-[#e65e3d]" />
-            <span>Zero Chef Jargon • Interactive Step Checklist • Absolute Survival</span>
+            <span>Zero Chef Jargon • Interactive Voice Chef • Blinkit/Zepto In 10 Mins</span>
           </div>
 
           <h1 className="mt-4 font-serif text-3xl font-extrabold tracking-tight text-[#142228] dark:text-[#f3eee4] sm:text-5xl sm:leading-[1.15]">
@@ -935,10 +1187,10 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
           </h1>
 
           <p className="mt-3 text-sm text-[#455860] dark:text-[#c5d8d0] sm:text-base leading-relaxed max-w-xl mx-auto font-medium">
-            Throw in whatever random ingredients survived in your room. We&apos;ll give you 2 foolproof, zero-panic recipes with step-by-step hand-holding.
+            Throw in whatever random ingredients survived in your room or snap a photo. We&apos;ll give you {tierMode === 'pro' ? '4-5' : '3'} foolproof survival recipes with step-by-step hand-holding.
           </p>
 
-          {/* Kitchen Confidence Meter */}
+          {/* Kitchen Confidence Meter & Active Mode Pill */}
           <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#fffdf9] dark:bg-[#162126] border border-[#ded4c1] dark:border-[#2a3c45] px-4 py-1 text-xs font-semibold text-[#3e5058] dark:text-[#9cb0a8] shadow-xs backdrop-blur-xs">
             <Activity size={14} className={confidenceScore >= 70 ? 'text-[#166e64] dark:text-[#38c9bc]' : 'text-[#e65e3d]'} />
             <span>Kitchen Confidence:</span>
@@ -949,6 +1201,9 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 ? `${confidenceScore}% (Quick Snack Ready)`
                 : '100% (Foolproof Feast Incoming!)'}
             </span>
+            <span className="text-[0.7rem] px-2 py-0.5 rounded-full bg-[#f4c453]/30 text-[#8c6700] dark:text-[#f7d377] font-bold">
+              {tierMode === 'pro' ? '✨ Pro AI + DB Mode' : '⚡ Fast DB Mode'}
+            </span>
           </div>
         </div>
 
@@ -956,24 +1211,38 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
         <div className="mt-10 mx-auto max-w-3xl">
           <div className="rounded-2xl border border-[#ded4c1] dark:border-[#27373f] bg-[#fffdf9] dark:bg-[#162025] p-5 sm:p-8 shadow-sm backdrop-blur-xs paper-card transition-colors">
             
-            {/* Step 1: Ingredients Tag Input */}
+            {/* Step 1: Ingredients Tag Input + Photo Scanner Trigger */}
             <div>
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-sm font-bold text-[#16202a] dark:text-[#e4efe9]">
                   <ChefHat size={18} className="text-[#e65e3d]" />
                   <span>1. What ingredients do you have?</span>
                 </label>
-                {ingredients.length > 0 && (
+                <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => {
-                      sounds.playDelete();
-                      setIngredients([]);
+                      sounds.playPop();
+                      setIsPhotoScannerOpen(true);
                     }}
-                    className="text-xs font-semibold text-[#61747d] dark:text-[#8e9f99] hover:text-[#e65e3d] transition"
+                    className="flex items-center gap-1 rounded-lg border border-[#b2ded0] dark:border-[#244f43] bg-[#def2ea] dark:bg-[#133028] px-2.5 py-1 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc] hover:bg-[#cbece0] transition active:scale-95 shadow-2xs"
                   >
-                    Clear all ({ingredients.length})
+                    <Camera size={13} />
+                    <span>📸 Scan Stash Photo</span>
                   </button>
-                )}
+
+                  {ingredients.length > 0 && (
+                    <button
+                      onClick={() => {
+                        sounds.playDelete();
+                        setIngredients([]);
+                      }}
+                      className="text-xs font-semibold text-[#61747d] dark:text-[#8e9f99] hover:text-[#e65e3d] transition"
+                    >
+                      Clear all ({ingredients.length})
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Input Field with Add Button */}
@@ -1004,7 +1273,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               <div className="mt-3 min-h-[38px]">
                 {ingredients.length === 0 ? (
                   <p className="text-xs text-[#61747d] dark:text-[#84958f] italic">
-                    No ingredients added yet. Type above or click a quick suggestion below!
+                    No ingredients added yet. Type above, snap a fridge photo, or click a quick suggestion below!
                   </p>
                 ) : (
                   <div className="flex flex-wrap gap-2">
@@ -1230,6 +1499,48 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
           </div>
         </div>
 
+        {/* Inedible Safety Guard Warning Banner */}
+        {inedibleAlert && (
+          <div className="mt-8 mx-auto max-w-2xl rounded-2xl border-2 border-[#e65e3d] bg-[#fff5f3] dark:bg-[#2c1511] p-5 shadow-lg animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-start gap-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e65e3d] text-white shadow-xs">
+                <ShieldAlert size={22} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-serif text-base font-bold text-[#b8321a] dark:text-[#ff7862]">
+                  ⚠️ Non-Food / Inedible Item Detected!
+                </h3>
+                <p className="mt-1 text-xs font-semibold text-[#802312] dark:text-[#fca595]">
+                  {inedibleAlert.message}
+                </p>
+                <div className="mt-2.5 rounded-lg bg-[#fde3dd] dark:bg-[#3c1d18] px-3 py-1.5 text-xs italic text-[#b8321a] dark:text-[#ff927e] font-medium">
+                  {inedibleAlert.humorousQuote}
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setIngredients((prev) =>
+                        prev.filter((item) => !inedibleAlert.invalidItems.includes(item))
+                      );
+                      setInedibleAlert(null);
+                      sounds.playPop();
+                    }}
+                    className="rounded-lg bg-[#b8321a] px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#992612] transition"
+                  >
+                    Remove Inedible Items ({inedibleAlert.invalidItems.length})
+                  </button>
+                  <button
+                    onClick={() => setInedibleAlert(null)}
+                    className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#802312] dark:text-[#fca595] hover:underline"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Sizzling Pan Animated Loading Card */}
         {isLoading && (
           <div className="mt-10 mx-auto max-w-xl text-center rounded-2xl border border-[#ded4c1] dark:border-[#2c3d45] bg-[#fffdf9] dark:bg-[#162126] p-8 shadow-sm animate-in fade-in zoom-in-95 duration-300">
@@ -1243,7 +1554,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
               {LOADING_MESSAGES[loadingMsgIndex]}
             </h3>
             <p className="mt-1.5 text-xs text-[#52636a] dark:text-[#8ca199] font-semibold">
-              ✨ Zero panic • Your meal is only a few minutes away!
+              ✨ Zero panic • Blending database & AI recipes for you!
             </p>
           </div>
         )}
@@ -1256,7 +1567,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 <div>
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#166e64] dark:text-[#38c9bc]">
                     <Sparkles size={14} />
-                    <span>Your Survival Menu</span>
+                    <span>Your Survival Menu ({recipes.length} Options)</span>
                   </div>
                   <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-extrabold text-[#16202a] dark:text-[#f3eee4]">
                     Pick what looks easiest:
@@ -1290,7 +1601,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         headerBg: 'bg-[#faedd7] dark:bg-[#2a1e14]',
                         accentInk: 'text-[#9e5218] dark:text-[#f39c5a]',
                         border: 'border-[#ebd2ad] dark:border-[#4d3623]',
-                        badge: 'The Flavor Upgrade',
+                        badge: index === 1 ? 'Flavor Upgrade' : 'Chef Jugaad',
                       };
 
                   const isHackOpen = expandedHackIndex === index;
@@ -1308,11 +1619,22 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                       <div>
                         <div className={`p-4 sm:p-5 ${themeColors.headerBg} border-b ${themeColors.border}`}>
                           <div className="flex items-center justify-between gap-2">
-                            <span
-                              className={`rounded-full px-2.5 py-0.5 text-[0.68rem] font-extrabold uppercase tracking-wider ${themeColors.accentInk} bg-white/90 dark:bg-black/40 border border-current/20 shadow-2xs`}
-                            >
-                              {themeColors.badge}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`rounded-full px-2.5 py-0.5 text-[0.68rem] font-extrabold uppercase tracking-wider ${themeColors.accentInk} bg-white/90 dark:bg-black/40 border border-current/20 shadow-2xs`}
+                              >
+                                {themeColors.badge}
+                              </span>
+                              {recipe.sourceBadge === 'ai' ? (
+                                <span className="rounded-full bg-[#f4c453] px-2 py-0.5 text-[0.65rem] font-extrabold text-[#16202a] shadow-2xs">
+                                  ✨ AI Generated
+                                </span>
+                              ) : (
+                                <span className="rounded-full bg-[#166e64] px-2 py-0.5 text-[0.65rem] font-extrabold text-white shadow-2xs">
+                                  📚 Civilization Classic
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-1.5 text-xs font-bold text-[#4b5d65] dark:text-[#b4cbbf]">
                               <Clock size={14} className={themeColors.accentInk} />
                               <span>{recipe.prepTime}</span>
@@ -1339,15 +1661,31 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                           </div>
                         </div>
 
-                        {/* Missing Ingredients Warning / Good to Go */}
+                        {/* Missing Ingredients with 10-Min Quick Delivery Deep Link */}
                         <div className="px-5 py-3 border-b border-[#ded4c1]/60 dark:border-[#233238] bg-[#f8f3ea] dark:bg-[#12191d]">
                           {recipe.missingIngredients && recipe.missingIngredients.length > 0 ? (
-                            <div className="flex items-start gap-2 text-xs text-[#854d0e] dark:text-[#fcd34d] font-semibold">
-                              <Info size={14} className="shrink-0 mt-0.5 text-[#9e5218] dark:text-[#f39c5a]" />
-                              <span>
-                                <strong>Missing / Optional:</strong>{' '}
-                                {recipe.missingIngredients.join(', ')}
-                              </span>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                              <div className="flex items-start gap-2 text-[#854d0e] dark:text-[#fcd34d] font-semibold">
+                                <Info size={14} className="shrink-0 mt-0.5 text-[#9e5218] dark:text-[#f39c5a]" />
+                                <span>
+                                  <strong>Missing / Optional:</strong>{' '}
+                                  {recipe.missingIngredients.join(', ')}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  sounds.playPop();
+                                  setDeliveryModal({
+                                    isOpen: true,
+                                    recipeName: recipe.recipeName,
+                                    missingItems: recipe.missingIngredients,
+                                  });
+                                }}
+                                className="flex items-center gap-1 self-start sm:self-auto rounded-lg bg-[#e65e3d] px-2.5 py-1 text-[0.7rem] font-extrabold text-white shadow-xs hover:bg-[#d95334] transition active:scale-95 shrink-0"
+                              >
+                                <Zap size={11} className="animate-pulse" />
+                                <span>⚡ 10-Min Delivery (Blinkit/Zepto)</span>
+                              </button>
                             </div>
                           ) : (
                             <div className="flex items-center gap-1.5 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc]">
@@ -1427,7 +1765,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         <button
                           type="button"
                           onClick={() => handleStartCooking(recipe)}
-                          className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#166e64] dark:bg-[#207c72] py-2 px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#115e54] active:scale-95"
+                          className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#166e64] dark:bg-[#207c72] py-2.5 px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#115e54] active:scale-95"
                         >
                           <Play size={14} />
                           <span>Start Cooking Mode</span>
@@ -1436,7 +1774,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                         <button
                           type="button"
                           onClick={() => handleCopyRecipe(recipe, index)}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-[#ded4c1] dark:border-[#2c3f47] bg-[#fffdf9] dark:bg-[#182328] px-3 py-2 text-xs font-semibold text-[#374950] dark:text-[#b4cbbf] transition hover:border-[#166e64] hover:text-[#166e64] shrink-0"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-[#ded4c1] dark:border-[#2c3f47] bg-[#fffdf9] dark:bg-[#182328] px-3 py-2.5 text-xs font-semibold text-[#374950] dark:text-[#b4cbbf] transition hover:border-[#166e64] hover:text-[#166e64] shrink-0"
                           title="Copy recipe text to clipboard"
                         >
                           {copiedIndex === index ? (
@@ -1494,6 +1832,24 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             </div>
 
             <div className="flex items-center gap-3">
+              {/* Hands-Free Voice Assistant Toggle Button */}
+              <button
+                onClick={() => {
+                  const active = voiceChefRef.current?.toggle();
+                  setIsVoiceChefActive(!!active);
+                  sounds.playPop();
+                }}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition shadow-xs ${
+                  isVoiceChefActive
+                    ? 'bg-[#e65e3d] text-white animate-pulse'
+                    : 'border border-[#ded4c1] dark:border-[#2c3d45] bg-[#fffdf9] dark:bg-[#182329] text-[#374950] dark:text-[#a2b5ae]'
+                }`}
+                title="Hands-free Voice Chef (Say 'Next step', 'Repeat', 'Set timer 2 minutes')"
+              >
+                {isVoiceChefActive ? <Mic size={14} /> : <MicOff size={14} />}
+                <span>{isVoiceChefActive ? 'Voice Chef Active' : 'Enable Voice Chef'}</span>
+              </button>
+
               {/* Step Progress Pill */}
               <span className="rounded-full bg-[#def2ea] dark:bg-[#1d6a64]/30 px-3 py-1 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc]">
                 {completedSteps.length} / {activeCookingRecipe.idiotProofSteps.length} Steps
@@ -1521,10 +1877,28 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
                 />
               </div>
 
+              {/* Hands-Free Voice Assistant Active Bar */}
+              {isVoiceChefActive && (
+                <div className="mb-5 rounded-2xl border border-[#f4c453] bg-[#fffcf4] dark:bg-[#282110] p-3 text-xs flex items-center justify-between gap-2 shadow-xs animate-in slide-in-from-top-2">
+                  <div className="flex items-center gap-2 text-[#8c6700] dark:text-[#f8d87d] font-bold">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e65e3d] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#e65e3d]"></span>
+                    </span>
+                    <span>Hands-Free Mic Active. Say &quot;Next step&quot;, &quot;Repeat&quot;, or &quot;Set timer 2 mins&quot;</span>
+                  </div>
+                  {voiceTranscript && (
+                    <span className="text-[0.68rem] text-[#8c6700] dark:text-[#f8d87d] italic font-medium">
+                      &quot;{voiceTranscript}&quot;
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* Quick Reassurance Banner */}
               <div className="mb-6 flex items-center gap-2 rounded-xl bg-[#def2ea] dark:bg-[#133029] p-3 text-xs font-bold text-[#0f5c53] dark:text-[#38c9bc] border border-[#b2ded0] dark:border-[#224f44]">
                 <ShieldCheck size={16} />
-                <span>Tap each step to check it off. Take your time—no rush!</span>
+                <span>Tap each step to check it off or speak commands with hands-free Voice Chef!</span>
               </div>
 
               {/* Step-by-Step Checklist */}
@@ -1708,6 +2082,38 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
       )}
 
       {/* ========================================== */}
+      {/* 10-Minute Delivery Modal (Blinkit/Zepto) */}
+      {/* ========================================== */}
+      <QuickDeliveryModal
+        isOpen={deliveryModal.isOpen}
+        onClose={() => setDeliveryModal({ ...deliveryModal, isOpen: false })}
+        recipeName={deliveryModal.recipeName}
+        missingItems={deliveryModal.missingItems}
+      />
+
+      {/* ========================================== */}
+      {/* Multimodal Stash Photo Vision OCR Scanner */}
+      {/* ========================================== */}
+      <PhotoScannerModal
+        isOpen={isPhotoScannerOpen}
+        onClose={() => setIsPhotoScannerOpen(false)}
+        onIngredientsDetected={(newItems) => {
+          setIngredients((prev) => Array.from(new Set([...prev, ...newItems])));
+          sounds.playSuccess();
+        }}
+      />
+
+      {/* ========================================== */}
+      {/* Google Profile & AI Credits Auth Modal */}
+      {/* ========================================== */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        user={userProfile}
+        onUserUpdate={(u) => setUserProfile(u)}
+      />
+
+      {/* ========================================== */}
       {/* FOOTER */}
       {/* ========================================== */}
       <footer className="relative z-10 mt-20 border-t border-[#ded4c1] dark:border-[#27373f] bg-[#f8f5ee] dark:bg-[#151e22] py-8 text-center text-xs text-[#52636a] dark:text-[#7a8e87] transition-colors">
@@ -1716,7 +2122,7 @@ ${recipe.idiotProofSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
             JugaadBites: The Idiot-Proof Recipe Finder
           </p>
           <p className="mt-1 text-[0.7rem] text-[#61747d] dark:text-[#7a8e87]">
-            Built with React, Vite, Tailwind CSS & Google Gemini 1.5 Flash • PWA Installable.
+            Built with React, Vite, Tailwind CSS, Google Gemini 1.5 Flash & Groq • PWA Installable.
           </p>
         </div>
       </footer>
